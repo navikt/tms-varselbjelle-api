@@ -1,6 +1,6 @@
-package no.nav.tms.template.config
+package no.nav.tms.varselbjelle.api.config
 
-import no.nav.tms.template.health.HealthService
+import no.nav.tms.varselbjelle.api.health.HealthService
 
 class ApplicationContext {
 

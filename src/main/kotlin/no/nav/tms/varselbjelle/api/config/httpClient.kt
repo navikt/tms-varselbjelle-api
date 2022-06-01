@@ -1,4 +1,4 @@
-package no.nav.tms.template.config
+package no.nav.tms.varselbjelle.api.config
 
 import io.ktor.client.HttpClient
 import io.ktor.client.request.*

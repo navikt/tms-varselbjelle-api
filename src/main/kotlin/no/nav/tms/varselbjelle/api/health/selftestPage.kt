@@ -1,12 +1,10 @@
-package no.nav.tms.template.health
+package no.nav.tms.varselbjelle.api.health
 
 import io.ktor.application.*
 import io.ktor.html.*
 import io.ktor.http.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.html.*
-import no.nav.tms.template.config.Environment
-import no.nav.tms.template.config.HttpClientBuilder
 
 suspend fun ApplicationCall.buildSelftestPage(healthService: HealthService) = coroutineScope {
 
@@ -21,10 +19,10 @@ suspend fun ApplicationCall.buildSelftestPage(healthService: HealthService) = co
     })
     {
         head {
-            title { +"Selftest tms-ktor-template" }
+            title { +"Selftest tms-varselbjelle-api" }
         }
         body {
-            var text = if(hasFailedChecks) {
+            val text = if(hasFailedChecks) {
                 "FEIL"
             } else {
                 "Service-status: OK"
@@ -39,7 +37,7 @@ suspend fun ApplicationCall.buildSelftestPage(healthService: HealthService) = co
             }
             table {
                 thead {
-                    tr { th { +"SELFTEST tms-ktor-template" } }
+                    tr { th { +"SELFTEST tms-varselbjelle-api" } }
                 }
                 tbody {
                     healthChecks.map {

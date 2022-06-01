@@ -1,6 +1,6 @@
-package no.nav.tms.template.health
+package no.nav.tms.varselbjelle.api.health
 
-import no.nav.tms.template.config.ApplicationContext
+import no.nav.tms.varselbjelle.api.config.ApplicationContext
 
 class HealthService(private val applicationContext: ApplicationContext) {
 
