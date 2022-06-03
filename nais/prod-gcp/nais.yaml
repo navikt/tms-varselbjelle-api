@@ -11,10 +11,10 @@ spec:
   image: {{version}}
   port: 8080
   liveness:
-    path: /tms-varselbjelle-api/internal/isAlive
+    path: /internal/isAlive
     initialDelay: 10
   readiness:
-    path: /tms-varselbjelle-api/internal/isReady
+    path: /internal/isReady
     initialDelay: 10
   replicas:
     min: 2
