@@ -57,7 +57,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "io.ktor.server.netty.EngineMain"
+    mainClassName = "no.nav.tms.varselbjelle.api.config.ApplicationKt"
 }
 
 tasks {
@@ -67,17 +67,6 @@ tasks {
             exceptionFormat = TestExceptionFormat.FULL
             events("passed", "skipped", "failed")
         }
-    }
-
-    register("runServer", JavaExec::class) {
-
-        environment("CORS_ALLOWED_ORIGINS", "localhost:9002")
-
-        environment("NAIS_CLUSTER_NAME", "dev-sbs")
-        environment("NAIS_NAMESPACE", "personbruker")
-
-        main = application.mainClassName
-        classpath = sourceSets["main"].runtimeClasspath
     }
 }
 
