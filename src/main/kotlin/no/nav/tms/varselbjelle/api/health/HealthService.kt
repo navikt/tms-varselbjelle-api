@@ -1,8 +1,6 @@
 package no.nav.tms.varselbjelle.api.health
 
-import no.nav.tms.varselbjelle.api.config.ApplicationContext
-
-class HealthService(private val applicationContext: ApplicationContext) {
+class HealthService() {
 
     suspend fun getHealthChecks(): List<HealthStatus> {
         return emptyList()

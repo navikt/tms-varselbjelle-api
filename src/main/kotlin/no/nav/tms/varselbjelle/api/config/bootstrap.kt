@@ -6,9 +6,10 @@ import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
+import no.nav.tms.varselbjelle.api.health.HealthService
 import no.nav.tms.varselbjelle.api.health.healthApi
 
-fun Application.mainModule(appContext: ApplicationContext = ApplicationContext()) {
+fun Application.varselbjelleApi(healthService: HealthService, httpClient: HttpClient) {
     val environment = Environment()
 
     install(DefaultHeaders)
@@ -24,10 +25,10 @@ fun Application.mainModule(appContext: ApplicationContext = ApplicationContext()
     }
 
     routing {
-        healthApi(appContext.healthService)
+        healthApi(healthService)
     }
 
-    configureShutdownHook(appContext.httpClient)
+    configureShutdownHook(httpClient)
 }
 
 private fun Application.configureShutdownHook(httpClient: HttpClient) {
