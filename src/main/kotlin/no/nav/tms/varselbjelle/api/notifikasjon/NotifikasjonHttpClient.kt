@@ -9,7 +9,7 @@ class NotifikasjonHttpClient(
     private val client: HttpClient,
     private val eventHandlerBaseURL: URL
 ) {
-    suspend fun getNotifikasjoner(accessToken: AccessToken): List<Notifikasjon> {
+    suspend fun getNotifikasjoner(accessToken: AccessToken): Notifikasjoner {
         return client.get(URL("$eventHandlerBaseURL/fetch/event/inaktive"), accessToken)
     }
 }
