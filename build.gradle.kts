@@ -44,9 +44,9 @@ dependencies {
     implementation(Logstash.logbackEncoder)
 
     testImplementation(Junit.api)
-    testImplementation(Ktor.clientMock)
-    testImplementation(Ktor.clientMockJvm)
-    testImplementation(Kluent.kluent)
+    testImplementation(Ktor.serverTestHost)
+    testImplementation(Kotest.runnerJunit5)
+    testImplementation(Kotest.assertionsCore)
     testImplementation(Mockk.mockk)
     testImplementation(Jjwt.api)
 

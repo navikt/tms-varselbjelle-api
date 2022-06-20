@@ -9,8 +9,10 @@ fun main() {
     val httpClient = HttpClientBuilder.build()
     val healthService = HealthService()
 
+    val environment = Environment()
+
     embeddedServer(Netty, port = 8080) {
-        varselbjelleApi(healthService, httpClient)
+        varselbjelleApi(healthService, httpClient, environment.corsAllowedOrigins)
     }.start(wait = true)
 
 }
