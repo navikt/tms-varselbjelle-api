@@ -5,27 +5,12 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
-import java.time.ZonedDateTime
+import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonHttpClient
 
-fun Route.varsel() {
+fun Route.varsel(notifikasjonHttpClient: NotifikasjonHttpClient) {
 
     get("rest/varsel/hentsiste") {
-        val dummyVarsel = NyeVarsler(
-            listOf(
-                Varsel(
-                    "123",
-                    "www.nav.no",
-                    "",
-                    "1234",
-                    1L,
-                    "",
-                    ZonedDateTime.now(),
-                    ZonedDateTime.now()
-                )
-            ),
-            1
-        )
-        call.respond(HttpStatusCode.OK, dummyVarsel)
+        call.respond(HttpStatusCode.OK, notifikasjonHttpClient.getNotifikasjoner(AccessToken("tull")).somVarselbjellevarsel())
     }
 }
 

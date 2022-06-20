@@ -1,7 +1,13 @@
+@file:UseSerializers(ZonedDateTimeSerializer::class)
+
 package no.nav.tms.varselbjelle.api.notifikasjon
 
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import no.nav.tms.varselbjelle.api.ZonedDateTimeSerializer
 import java.time.ZonedDateTime
 
+@Serializable
 data class Notifikasjon(
     private val grupperingsId: String,
     private val eventId: String,
@@ -16,6 +22,7 @@ data class Notifikasjon(
     private val forstBehandlet: ZonedDateTime
 )
 
+@Serializable
 enum class EventType(val eventType: String) {
     OPPGAVE("oppgave"),
     BESKJED("beskjed"),

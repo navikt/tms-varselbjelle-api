@@ -12,12 +12,14 @@ import io.ktor.routing.routing
 import io.ktor.serialization.json
 import no.nav.tms.varselbjelle.api.health.HealthService
 import no.nav.tms.varselbjelle.api.health.healthApi
+import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonHttpClient
 import no.nav.tms.varselbjelle.api.varsel
 
 fun Application.varselbjelleApi(
     healthService: HealthService,
     httpClient: HttpClient,
-    corsAllowedOrigins: String
+    corsAllowedOrigins: String,
+    notifikasjonHttpClient: NotifikasjonHttpClient
 ) {
 
     install(DefaultHeaders)
@@ -34,7 +36,7 @@ fun Application.varselbjelleApi(
 
     routing {
         healthApi(healthService)
-        varsel()
+        varsel(notifikasjonHttpClient)
     }
 
     configureShutdownHook(httpClient)

@@ -7,10 +7,11 @@ import java.net.URL
 
 class NotifikasjonHttpClient(
     private val client: HttpClient,
-    private val eventHandlerBaseURL: URL
+    private val eventHandlerBaseURL: String
 ) {
     suspend fun getNotifikasjoner(accessToken: AccessToken): Notifikasjoner {
-        return client.get(URL("$eventHandlerBaseURL/fetch/event/inaktive"), accessToken)
+        val notifikasjoner = client.get<List<Notifikasjon>>(URL("$eventHandlerBaseURL/fetch/event/inaktive"), accessToken)
+        return Notifikasjoner(notifikasjoner)
     }
 }
 
