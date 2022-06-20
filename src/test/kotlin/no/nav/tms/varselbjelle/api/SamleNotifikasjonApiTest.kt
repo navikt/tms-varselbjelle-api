@@ -1,5 +1,6 @@
 package no.nav.tms.varselbjelle.api
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.matchers.shouldBe
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.Test
 class SamleNotifikasjonApiTest {
 
     @Test
-    fun `skal returnere varselbjelle-varsel på riktig format`() {
+    fun `returnerer samle-notifikasjon på varselbjelle-formmat`() {
 
         val response = withTestApplication(mockVarselbjelleApi())  {
             handleRequest(HttpMethod.Get, "rest/varsel/hentsiste") {}
@@ -18,6 +19,9 @@ class SamleNotifikasjonApiTest {
 
         response.status() shouldBe HttpStatusCode.OK
 
-        //val eventJson = ObjectMapper().readTree(response.content)[0]
+        val varselJson = ObjectMapper().readTree(response.content)
+
+        varselJson["nyesteVarsler"].size() shouldBe 1
+        varselJson["totaltAntallUleste"].asInt() shouldBe 1
     }
 }
