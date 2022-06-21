@@ -1,10 +1,11 @@
-package no.nav.tms.varselbjelle.api.config
+package no.nav.tms.varselbjelle.api
 
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import no.nav.tms.varselbjelle.api.config.Environment
+import no.nav.tms.varselbjelle.api.config.HttpClientBuilder
 import no.nav.tms.varselbjelle.api.health.HealthService
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
-import no.nav.tms.varselbjelle.api.varselbjelleApi
 
 fun main() {
 

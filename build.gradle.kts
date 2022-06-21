@@ -58,7 +58,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("no.nav.tms.varselbjelle.api.config.ApplicationKt")
+    mainClass.set("no.nav.tms.varselbjelle.api.ApplicationKt")
 }
 
 tasks {
