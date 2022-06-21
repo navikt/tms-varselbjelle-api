@@ -4,7 +4,7 @@ package no.nav.tms.varselbjelle.api.notifikasjon
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import no.nav.tms.varselbjelle.api.ZonedDateTimeSerializer
+import no.nav.tms.varselbjelle.api.config.ZonedDateTimeSerializer
 import java.time.ZonedDateTime
 
 @Serializable
@@ -19,7 +19,7 @@ data class Notifikasjon(
     private val link: String,
     private val aktiv: Boolean,
     private val type: EventType,
-    private val forstBehandlet: ZonedDateTime
+    val forstBehandlet: ZonedDateTime
 )
 
 @Serializable

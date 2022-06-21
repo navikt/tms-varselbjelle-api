@@ -5,12 +5,15 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.routing.Route
 import io.ktor.routing.get
-import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonHttpClient
+import no.nav.tms.varselbjelle.api.config.AccessToken
+import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 
-fun Route.varsel(notifikasjonHttpClient: NotifikasjonHttpClient) {
+fun Route.varsel(notifikasjonConsumer: NotifikasjonConsumer, varselsideUrl: String) {
 
     get("rest/varsel/hentsiste") {
-        call.respond(HttpStatusCode.OK, notifikasjonHttpClient.getNotifikasjoner(AccessToken("tull")).somVarselbjellevarsel())
+        val notifikasjoner = notifikasjonConsumer.getNotifikasjoner(AccessToken("tull"))
+
+        call.respond(HttpStatusCode.OK, SammendragsVarsel(notifikasjoner, varselsideUrl) )
     }
 }
 

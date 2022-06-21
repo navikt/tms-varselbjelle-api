@@ -17,7 +17,7 @@ import kotlinx.serialization.json.Json
 import no.nav.tms.varselbjelle.api.config.HttpClientBuilder
 import no.nav.tms.varselbjelle.api.notifikasjon.EventType
 import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
-import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonHttpClient
+import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZoneId
@@ -42,10 +42,9 @@ class SamleNotifikasjonApiTest {
     }
 
     @Test
-    @Disabled
-    fun `ende til ende`() {
+    fun `ende til ende-test av notifikasjon til varselbjelle-varsel`() {
 
-        val notifikasjonResponse = listOf(
+        val notifikasjoner = listOf(
             Notifikasjon(
                 grupperingsId = "123",
                 eventId = "456",
@@ -61,20 +60,20 @@ class SamleNotifikasjonApiTest {
             )
         )
 
-        val httpClient: HttpClient = HttpClientBuilder.build(MockEngine {
+        val notifikasjonHttpClient: HttpClient = HttpClientBuilder.build(MockEngine {
             respond(
-                Json.encodeToString(notifikasjonResponse),
+                Json.encodeToString(notifikasjoner),
                 HttpStatusCode.OK,
                 headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
             )
         })
 
-        val notifikasjonHttpClient = NotifikasjonHttpClient(httpClient, "http://localhost")
+        val notifikasjonConsumer = NotifikasjonConsumer(notifikasjonHttpClient, "http://localhost")
 
         val response = withTestApplication(
             mockVarselbjelleApi(
-                httpClient = httpClient,
-                notifikasjonHttpClient = notifikasjonHttpClient
+                httpClient = notifikasjonHttpClient,
+                notifikasjonConsumer = notifikasjonConsumer
             )
         ) {
             handleRequest(HttpMethod.Get, "rest/varsel/hentsiste") {}
@@ -86,6 +85,7 @@ class SamleNotifikasjonApiTest {
 
         varselJson["totaltAntallUleste"].asInt() shouldBe 1
         varselJson["nyesteVarsler"].size() shouldBe 1
+        varselJson["nyesteVarsler"][0]["varseltekst"].asText() shouldBe "Du har 1 varsel"
     }
 
 }

@@ -1,15 +1,24 @@
-package no.nav.tms.varselbjelle.api.notifikasjon
+package no.nav.tms.varselbjelle.api
 
 import io.kotest.matchers.shouldBe
+import no.nav.tms.varselbjelle.api.notifikasjon.EventType
+import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class NotifikasjonerTest {
+class SammendragsVarselTest {
+
+    @Test
+    @Disabled
+    fun `returnerer tom liste ved ingen aktive notifikasjoner`() {
+
+    }
 
     @Test
     fun `konverterer enkel beskjed til varselbjelle-varsel`() {
-        val notifikasjoner = Notifikasjoner(
+        val varselbjelleVarsel = SammendragsVarsel(
             listOf(
                 Notifikasjon(
                     grupperingsId = "123",
@@ -24,11 +33,16 @@ class NotifikasjonerTest {
                     aktiv = true,
                     type = EventType.BESKJED
                 )
-            )
+            ),
+            "url"
         )
 
-        val varselbjelleVarsel = notifikasjoner.somVarselbjellevarsel()
-
         varselbjelleVarsel.totaltAntallUleste shouldBe 1
+    }
+
+    @Test
+    @Disabled
+    fun `konverterer liste av notifikasjoner til varselbjelle-varsel`() {
+
     }
 }

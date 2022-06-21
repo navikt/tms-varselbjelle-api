@@ -1,4 +1,4 @@
-package no.nav.tms.varselbjelle.api
+package no.nav.tms.varselbjelle.api.config
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
