@@ -41,7 +41,28 @@ class SammendragsVarselTest {
 
     @Test
     @Disabled
-    fun `konverterer liste av notifikasjoner til varselbjelle-varsel`() {
+    fun `konverterer liste av notifikasjoner til varselbjelle-varsel med tidligste dato`() {
+        val tidligsteNotifikasjonTidspunkt = ZonedDateTime.of(2019, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
+        val sammendragsVarsel = SammendragsVarsel(
+            listOf(
+                Notifikasjon(
+                    forstBehandlet = ZonedDateTime.of(2022, 2, 2, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
+                ),
+                Notifikasjon(
+                    forstBehandlet = tidligsteNotifikasjonTidspunkt
+                ),
+                Notifikasjon(
+                    forstBehandlet = ZonedDateTime.of(2022, 3, 3, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
+                )
+            ),
+            "url"
+        )
 
+        sammendragsVarsel.totaltAntallUleste shouldBe 1
+        sammendragsVarsel.nyesteVarsler shouldHaveSize 1
+
+        val varsel = sammendragsVarsel.nyesteVarsler.first()
+        varsel.varseltekst shouldBe "Du har 3 varsler"
+        varsel.datoOpprettet shouldBe tidligsteNotifikasjonTidspunkt
     }
 }
