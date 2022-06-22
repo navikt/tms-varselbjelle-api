@@ -14,8 +14,9 @@ data class SammendragsVarsel(private val notifikasjoner: List<Notifikasjon>, pri
     val totaltAntallUleste: Int
 
     init {
-        val varseltekst = if (notifikasjoner.size == 1) "Du har 1 varsel"
-        else "Du har ${notifikasjoner.size} varsler"
+        val varseltekst =
+            if (notifikasjoner.size == 1) "Du har 1 varsel"
+            else "Du har ${notifikasjoner.size} varsler"
 
         if (notifikasjoner.isEmpty()) {
             nyesteVarsler = emptyList()

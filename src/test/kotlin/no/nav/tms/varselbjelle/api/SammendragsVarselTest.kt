@@ -2,7 +2,6 @@ package no.nav.tms.varselbjelle.api
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import no.nav.tms.varselbjelle.api.notifikasjon.EventType
 import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -26,17 +25,7 @@ class SammendragsVarselTest {
         val sammendragsVarsel = SammendragsVarsel(
             listOf(
                 Notifikasjon(
-                    grupperingsId = "123",
-                    eventId = "456",
-                    eventTidspunkt = ZonedDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo")),
-                    forstBehandlet = forstbehandlet,
-                    produsent = "produsent",
-                    sikkerhetsnivaa = 4,
-                    sistOppdatert = ZonedDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo")),
-                    tekst = "tekst",
-                    link = "link",
-                    aktiv = true,
-                    type = EventType.BESKJED
+                    forstBehandlet = forstbehandlet
                 )
             ),
             "url"

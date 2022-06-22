@@ -15,7 +15,6 @@ import io.ktor.server.testing.withTestApplication
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import no.nav.tms.varselbjelle.api.config.HttpClientBuilder
-import no.nav.tms.varselbjelle.api.notifikasjon.EventType
 import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 import org.junit.jupiter.api.Disabled
@@ -46,17 +45,7 @@ class VarselApiTest {
 
         val notifikasjoner = listOf(
             Notifikasjon(
-                grupperingsId = "123",
-                eventId = "456",
-                eventTidspunkt = ZonedDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo")),
                 forstBehandlet = ZonedDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo")),
-                produsent = "produsent",
-                sikkerhetsnivaa = 4,
-                sistOppdatert = ZonedDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo")),
-                tekst = "tekst",
-                link = "link",
-                aktiv = true,
-                type = EventType.BESKJED
             )
         )
 
