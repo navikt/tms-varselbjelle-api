@@ -27,7 +27,7 @@ data class SammendragsVarsel(private val notifikasjoner: List<Notifikasjon>, pri
                     aktoerID = "placeholder",
                     url = varselsideUrl,
                     varseltekst = varseltekst,
-                    varselId = "varselIdPlaceholder",
+                    varselId = "ubruktId",
                     id = 0L,
                     meldingsType = "default",
                     datoOpprettet = notifikasjoner.minOf { it.forstBehandlet },

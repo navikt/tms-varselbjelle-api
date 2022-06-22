@@ -17,28 +17,11 @@ import kotlinx.serialization.json.Json
 import no.nav.tms.varselbjelle.api.config.HttpClientBuilder
 import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
 class VarselApiTest {
-
-    @Test
-    @Disabled
-    fun `returnerer samle-notifikasjon på varselbjelle-formmat`() {
-
-        val response = withTestApplication(mockVarselbjelleApi()) {
-            handleRequest(HttpMethod.Get, "rest/varsel/hentsiste") {}
-        }.response
-
-        response.status() shouldBe HttpStatusCode.OK
-
-        val varselJson = ObjectMapper().readTree(response.content)
-
-        varselJson["nyesteVarsler"].size() shouldBe 1
-        varselJson["totaltAntallUleste"].asInt() shouldBe 1
-    }
 
     @Test
     fun `ende til ende-test av notifikasjon til varselbjelle-varsel`() {

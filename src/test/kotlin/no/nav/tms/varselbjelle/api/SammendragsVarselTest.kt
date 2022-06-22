@@ -3,7 +3,6 @@ package no.nav.tms.varselbjelle.api
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -11,7 +10,6 @@ import java.time.ZonedDateTime
 class SammendragsVarselTest {
 
     @Test
-    @Disabled
     fun `returnerer tom liste ved ingen aktive notifikasjoner`() {
         val sammendragsVarsel = SammendragsVarsel(emptyList(), "url")
 
@@ -22,13 +20,10 @@ class SammendragsVarselTest {
     @Test
     fun `konverterer enkel beskjed til varselbjelle-varsel`() {
         val forstbehandlet = ZonedDateTime.of(2019, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
+        val varselsideUrl = "www.nav.no/person/dittnav/varslinger"
         val sammendragsVarsel = SammendragsVarsel(
-            listOf(
-                Notifikasjon(
-                    forstBehandlet = forstbehandlet
-                )
-            ),
-            "url"
+            notifikasjoner = listOf(Notifikasjon(forstBehandlet = forstbehandlet)),
+            varselsideUrl = varselsideUrl
         )
 
         sammendragsVarsel.totaltAntallUleste shouldBe 1
@@ -36,11 +31,13 @@ class SammendragsVarselTest {
 
         val varsel = sammendragsVarsel.nyesteVarsler.first()
         varsel.varseltekst shouldBe "Du har 1 varsel"
+        varsel.varselId shouldBe "ubruktId"
+        varsel.url shouldBe varselsideUrl
+        varsel.meldingsType shouldBe "default"
         varsel.datoOpprettet shouldBe forstbehandlet
     }
 
     @Test
-    @Disabled
     fun `konverterer liste av notifikasjoner til varselbjelle-varsel med tidligste dato`() {
         val tidligsteNotifikasjonTidspunkt = ZonedDateTime.of(2019, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
         val sammendragsVarsel = SammendragsVarsel(
