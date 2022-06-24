@@ -52,7 +52,6 @@ dependencies {
     testImplementation(Mockk.mockk)
     testImplementation(Jjwt.api)
     testImplementation(Ktor.clientMock)
-    testImplementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
 
     testRuntimeOnly(Bouncycastle.bcprovJdk15on)
     testRuntimeOnly(Jjwt.impl)
