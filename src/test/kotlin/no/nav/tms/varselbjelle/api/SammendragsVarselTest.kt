@@ -18,7 +18,7 @@ class SammendragsVarselTest {
     }
 
     @Test
-    fun `konverterer enkel beskjed til varselbjelle-varsel`() {
+    fun `konverterer notifikasjon til varselbjelle-varsel med de nødvendige feltene satt`() {
         val forstbehandlet = ZonedDateTime.of(2019, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
         val varselsideUrl = "www.nav.no/person/dittnav/varslinger"
         val sammendragsVarsel = SammendragsVarsel(

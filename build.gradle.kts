@@ -25,6 +25,7 @@ repositories {
 
 dependencies {
     implementation(DittNAV.Common.logging)
+    implementation(DittNAV.Common.securityAuthenticatedUser)
     implementation(DittNAV.Common.utils)
     implementation(Jackson.dataTypeJsr310)
     implementation(Kotlinx.coroutines)
@@ -41,6 +42,8 @@ dependencies {
     implementation(Ktor.serialization)
     implementation(Logback.classic)
     implementation(Logstash.logbackEncoder)
+    implementation(NAV.tokenValidatorKtor)
+    implementation("com.github.navikt.tms-ktor-token-support:token-support-tokendings-exchange:2022.01.27-13.11-a6b55dd90347")
 
     testImplementation(Junit.api)
     testImplementation(Ktor.serverTestHost)

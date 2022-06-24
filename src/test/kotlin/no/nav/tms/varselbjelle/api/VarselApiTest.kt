@@ -12,11 +12,13 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
+import io.mockk.mockk
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import no.nav.tms.varselbjelle.api.config.HttpClientBuilder
 import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
+import no.nav.tms.varselbjelle.api.tokenx.EventhandlerTokendings
 import org.junit.jupiter.api.Test
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -40,7 +42,12 @@ class VarselApiTest {
             )
         })
 
-        val notifikasjonConsumer = NotifikasjonConsumer(notifikasjonHttpClient, "http://localhost")
+        val eventhandlerTokendings: EventhandlerTokendings = mockk(relaxed = true)
+        val notifikasjonConsumer = NotifikasjonConsumer(
+            client = notifikasjonHttpClient,
+            eventhandlerTokendings = eventhandlerTokendings,
+            eventHandlerBaseURL = "http://localhost"
+        )
 
         val response = withTestApplication(
             mockVarselbjelleApi(
