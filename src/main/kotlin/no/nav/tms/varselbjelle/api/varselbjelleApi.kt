@@ -13,8 +13,6 @@ import io.ktor.features.CORS
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
 import io.ktor.routing.routing
 import io.ktor.serialization.json
 import io.ktor.util.pipeline.PipelineContext
@@ -25,11 +23,6 @@ import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.health.HealthService
 import no.nav.tms.varselbjelle.api.health.healthApi
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import java.time.Instant
-
-val log: Logger = LoggerFactory.getLogger(Application::class.java)
 
 fun Application.varselbjelleApi(
     healthService: HealthService,
@@ -80,16 +73,3 @@ private fun Application.configureShutdownHook(httpClient: HttpClient) {
 
 val PipelineContext<Unit, ApplicationCall>.authenticatedUser: AuthenticatedUser
     get() = AuthenticatedUserFactory.createNewAuthenticatedUser(call)
-
-suspend fun PipelineContext<Unit, ApplicationCall>.executeOnUnexpiredTokensOnly(block: suspend () -> Unit) {
-    if (authenticatedUser.isTokenExpired()) {
-        val delta = authenticatedUser.tokenExpirationTime.epochSecond - Instant.now().epochSecond
-        val msg = "Mottok kall fra en bruker med et utløpt token, avviser request-en med en 401-respons. " +
-                "Tid siden tokenet løp ut: $delta sekunder, $authenticatedUser"
-        log.info(msg)
-        call.respond(HttpStatusCode.Unauthorized)
-
-    } else {
-        block.invoke()
-    }
-}

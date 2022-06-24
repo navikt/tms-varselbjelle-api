@@ -45,15 +45,15 @@ fun mockVarselbjelleApi(
 }
 
 /* dummyJwt:
-    {
-        "acr_values":"Level4",
-        "acr":"Level4",
-        "pid":"123",
-        "sub":"234",
-        "exp":4000000000,
-        "iat":1000000000,
-        "jti":"STUB"
-    }
-    */
+{
+    "acr_values":"Level4",
+    "acr":"Level4",
+    "pid":"123",
+    "sub":"234",
+    "exp":4000000000,
+    "iat":1000000000,
+    "jti":"STUB"
+}
+*/
 private const val dummyValidJwt =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY3JfdmFsdWVzIjoiTGV2ZWw0IiwiYWNyIjoiTGV2ZWw0IiwicGlkIjoiMTIzIiwic3ViIjoiMjM0IiwiZXhwIjo0MDAwMDAwMDAwLCJpYXQiOjE2NDk2NzQ3MDUsImp0aSI6IlNUVUIifQ.IrMe_wIepEessc5cnfyfmmtS_1YY6ZqpCe5rTzKHz6w"

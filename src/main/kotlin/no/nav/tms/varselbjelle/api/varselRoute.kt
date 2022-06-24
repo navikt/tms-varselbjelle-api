@@ -10,11 +10,9 @@ import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 fun Route.varsel(notifikasjonConsumer: NotifikasjonConsumer, varselsideUrl: String) {
 
     get("rest/varsel/hentsiste") {
-        executeOnUnexpiredTokensOnly {
-            val notifikasjoner = notifikasjonConsumer.getNotifikasjoner(authenticatedUser)
+        val notifikasjoner = notifikasjonConsumer.getNotifikasjoner(authenticatedUser)
 
-            call.respond(HttpStatusCode.OK, SammendragsVarsel(notifikasjoner, varselsideUrl))
-        }
+        call.respond(HttpStatusCode.OK, SammendragsVarsel(notifikasjoner, varselsideUrl))
     }
 }
 
