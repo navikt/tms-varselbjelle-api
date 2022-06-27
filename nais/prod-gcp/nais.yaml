@@ -8,6 +8,7 @@ metadata:
 spec:
   envFrom:
     - secret: tms-varselbjelle-api-secrets
+    - configmap: loginservice-idporten
   image: {{version}}
   port: 8080
   liveness:
