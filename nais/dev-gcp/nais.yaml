@@ -19,7 +19,8 @@ spec:
   replicas:
     min: 2
     max: 4
-  webproxy: true
+  tokenx:
+    enabled: true
   ingresses:
     - "https://person.dev.nav.no/tms-varselbjelle-api"
   resources:
