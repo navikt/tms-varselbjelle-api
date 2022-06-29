@@ -24,7 +24,7 @@ fun main() {
 
     val notifikasjonConsumer = NotifikasjonConsumer(httpClient, eventhandlerTokendings, environment.eventHandlerURL)
 
-    val jwkProvider = JwkProviderBuilder(URL(environment.loginserviceIdportenDiscoveryUrl))
+    val jwkProvider = JwkProviderBuilder(URL(environment.jwksUrl))
         .cached(10, 24, TimeUnit.HOURS)
         .rateLimited(10, 1, TimeUnit.MINUTES)
         .build()

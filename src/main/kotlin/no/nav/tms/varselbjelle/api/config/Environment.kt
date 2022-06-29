@@ -8,5 +8,6 @@ data class Environment(
     val eventhandlerClientId: String = getEnvVar("EVENTHANDLER_CLIENT_ID"),
     val varselsideUrl: String = getEnvVar("VARSELSIDE_URL"),
     val loginserviceIdportenDiscoveryUrl: String = getEnvVar("LOGINSERVICE_IDPORTEN_DISCOVERY_URL"),
+    val jwksUrl: String = getEnvVar("JWKS_URL"),
     val loginserviceIdportenAudience: String = getEnvVar("LOGINSERVICE_IDPORTEN_AUDIENCE")
 )
