@@ -30,8 +30,7 @@ fun Application.varselbjelleApi(
     httpClient: HttpClient,
     corsAllowedOrigins: String,
     notifikasjonConsumer: NotifikasjonConsumer,
-    varselsideUrl: String,
-    installAuthenticatorsFunction: Application.() -> Unit = installAuth(jwkProvider, jwtIssuer, jwtAudience)
+    varselsideUrl: String
 ) {
 
     install(DefaultHeaders)
@@ -42,7 +41,24 @@ fun Application.varselbjelleApi(
         header(HttpHeaders.ContentType)
     }
 
-    installAuthenticatorsFunction()
+    install(Authentication) {
+        jwt {
+            verifier(jwkProvider, jwtIssuer) {
+                withAudience(jwtAudience)
+            }
+            authHeader {
+                val cookie = requireNotNull(it.request.cookies["selvbetjening-idtoken"])
+                HttpAuthHeader.Single("Bearer", cookie)
+            }
+            validate { credentials ->
+                requireNotNull(credentials.payload.claims.pid()) {
+                    "Token må inneholde fødselsnummer for personen i enten pid claim"
+                }
+
+                JWTPrincipal(credentials.payload)
+            }
+        }
+    }
 
     install(ContentNegotiation) {
         json(jsonConfig())
@@ -57,34 +73,6 @@ fun Application.varselbjelleApi(
     }
 
     configureShutdownHook(httpClient)
-
-}
-
-private fun installAuth(
-    jwkProvider: JwkProvider,
-    jwtIssuer: String,
-    jwtAudience: String
-): Application.() -> Unit = {
-    install(Authentication) {
-        jwt {
-            verifier(jwkProvider, jwtIssuer) {
-                withAudience(jwtAudience)
-            }
-            realm = "tms-varselbjelle-api"
-            authHeader {
-                val cookie = requireNotNull(it.request.cookies["selvbetjening-idtoken"])
-                HttpAuthHeader.Single("Bearer", cookie)
-            }
-
-            validate { credentials ->
-                requireNotNull(credentials.payload.claims.pid()) {
-                    "Token må inneholde fødselsnummer for personen i enten pid claim"
-                }
-
-                JWTPrincipal(credentials.payload)
-            }
-        }
-    }
 }
 
 private fun Application.configureShutdownHook(httpClient: HttpClient) {
