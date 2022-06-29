@@ -9,5 +9,6 @@ data class Environment(
     val varselsideUrl: String = getEnvVar("VARSELSIDE_URL"),
     val loginserviceIdportenDiscoveryUrl: String = getEnvVar("LOGINSERVICE_IDPORTEN_DISCOVERY_URL"),
     val jwksUrl: String = getEnvVar("JWKS_URL"),
+    val jwksIssuer: String = getEnvVar("JWKS_ISSUER"),
     val loginserviceIdportenAudience: String = getEnvVar("LOGINSERVICE_IDPORTEN_AUDIENCE")
 )

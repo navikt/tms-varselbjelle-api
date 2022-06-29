@@ -32,7 +32,7 @@ fun main() {
     embeddedServer(Netty, port = 8080) {
         varselbjelleApi(
             jwkProvider = jwkProvider,
-            jwtIssuer = "selvbetjening",
+            jwtIssuer = environment.jwksIssuer,
             jwtAudience = environment.loginserviceIdportenAudience,
             healthService = healthService,
             httpClient = httpClient,
