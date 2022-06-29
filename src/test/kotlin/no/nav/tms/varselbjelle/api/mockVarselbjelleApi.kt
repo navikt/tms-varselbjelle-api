@@ -5,10 +5,13 @@ import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.AuthenticationPipeline
 import io.ktor.client.HttpClient
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.server.testing.TestApplicationEngine
+import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.setBody
 import io.mockk.mockk
-import no.nav.security.token.support.core.context.TokenValidationContext
-import no.nav.security.token.support.core.jwt.JwtToken
-import no.nav.security.token.support.ktor.TokenValidationContextPrincipal
 import no.nav.tms.varselbjelle.api.health.HealthService
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 
@@ -22,11 +25,15 @@ fun mockVarselbjelleApi(
         install(Authentication) {
             provider {
                 pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
+                    /*
                     context.principal(
+                        JWTPrincipal()
                         TokenValidationContextPrincipal(
                             TokenValidationContext(mapOf("dummyName" to JwtToken(dummyValidJwt)))
                         )
                     )
+
+                     */
                 }
             }
         }
@@ -34,6 +41,9 @@ fun mockVarselbjelleApi(
 ): Application.() -> Unit {
     return fun Application.() {
         varselbjelleApi(
+            jwkProvider = mockk(),
+            jwtIssuer = "",
+            jwtAudience = "",
             healthService = healthService,
             httpClient = httpClient,
             corsAllowedOrigins = corsAllowedOrigins,
@@ -42,6 +52,29 @@ fun mockVarselbjelleApi(
             installAuthenticatorsFunction = installAuthenticatorsFunction
         )
     }
+}
+
+fun TestApplicationEngine.autentisert(
+    httpMethod: HttpMethod = HttpMethod.Get,
+    endepunkt: String,
+    body: String? = null,
+    token: String = dummyValidJwt
+) = handleRequest(httpMethod, endepunkt) {
+    addHeader(
+        HttpHeaders.Accept,
+        ContentType.Application.Json.toString()
+    )
+    addHeader(
+        HttpHeaders.ContentType,
+        ContentType.Application.Json.toString()
+    )
+    addHeader(HttpHeaders.Authorization, "Bearer $token")
+    addHeader("Nav-Call-Id", "random call id")
+    addHeader("Nav-Consumer-Id", "dp-test")
+
+    addHeader("Cookie", "selvbetjening-idtoken=$token")
+
+    body?.also { setBody(it) }
 }
 
 /* dummyJwt:

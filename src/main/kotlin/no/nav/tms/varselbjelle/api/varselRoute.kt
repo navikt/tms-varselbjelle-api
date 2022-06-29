@@ -10,7 +10,8 @@ import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 fun Route.varsel(notifikasjonConsumer: NotifikasjonConsumer, varselsideUrl: String) {
 
     get("rest/varsel/hentsiste") {
-        val notifikasjoner = notifikasjonConsumer.getNotifikasjoner(authenticatedUser)
+        val token = call.request.cookies["selvbetjening-idtoken"]!!
+        val notifikasjoner = notifikasjonConsumer.getNotifikasjoner(token)
 
         call.respond(HttpStatusCode.OK, SammendragsVarsel(notifikasjoner, varselsideUrl))
     }

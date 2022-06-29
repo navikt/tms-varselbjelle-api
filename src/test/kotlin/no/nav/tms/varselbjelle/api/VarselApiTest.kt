@@ -10,7 +10,6 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
 import io.mockk.mockk
 import kotlinx.serialization.encodeToString
@@ -55,7 +54,7 @@ class VarselApiTest {
                 notifikasjonConsumer = notifikasjonConsumer
             )
         ) {
-            handleRequest(HttpMethod.Get, "rest/varsel/hentsiste") {}
+            autentisert(HttpMethod.Get, "rest/varsel/hentsiste")
         }.response
 
         response.status() shouldBe HttpStatusCode.OK
