@@ -10,7 +10,7 @@
         </appender>
     </appender>
 
-    <root level="TRACE">
+    <root level="INFO">
         <appender-ref ref="stdout_json"/>
         <appender-ref ref="metrics"/>
     </root>
