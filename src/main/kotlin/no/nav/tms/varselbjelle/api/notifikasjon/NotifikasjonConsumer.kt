@@ -12,7 +12,7 @@ class NotifikasjonConsumer(
 ) {
     suspend fun getNotifikasjoner(token: String): List<Notifikasjon> {
         val exchangedToken = eventhandlerTokendings.exchangeToken(token)
-        return client.get(URL("$eventHandlerBaseURL/fetch/event/inaktive"), exchangedToken)
+        return client.get(URL("$eventHandlerBaseURL/fetch/beskjed/inaktive"), exchangedToken)
     }
 }
 
