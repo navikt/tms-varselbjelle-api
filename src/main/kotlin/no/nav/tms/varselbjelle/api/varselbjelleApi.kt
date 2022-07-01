@@ -4,6 +4,7 @@ import com.auth0.jwk.JwkProvider
 import com.auth0.jwt.interfaces.Claim
 import io.ktor.application.Application
 import io.ktor.application.ApplicationStopping
+import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.auth.Authentication
 import io.ktor.auth.authenticate
@@ -13,8 +14,11 @@ import io.ktor.client.HttpClient
 import io.ktor.features.CORS
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.DefaultHeaders
+import io.ktor.features.StatusPages
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.auth.HttpAuthHeader
+import io.ktor.response.respond
 import io.ktor.routing.routing
 import io.ktor.serialization.json
 import no.nav.tms.varselbjelle.api.config.jsonConfig
@@ -47,7 +51,7 @@ fun Application.varselbjelleApi(
                 withAudience(jwtAudience)
             }
             authHeader {
-                val cookie = requireNotNull(it.request.cookies["selvbetjening-idtoken"])
+                val cookie = it.request.cookies["selvbetjening-idtoken"] ?: throw CookieNotSetException()
                 HttpAuthHeader.Single("Bearer", cookie)
             }
             validate { credentials ->
@@ -57,6 +61,13 @@ fun Application.varselbjelleApi(
 
                 JWTPrincipal(credentials.payload)
             }
+        }
+    }
+
+    install(StatusPages) {
+        exception<CookieNotSetException> { cause ->
+            val status = HttpStatusCode.Unauthorized
+            call.respond(status, cause.message ?: "")
         }
     }
 
@@ -82,3 +93,5 @@ private fun Application.configureShutdownHook(httpClient: HttpClient) {
 }
 
 private fun <V : Claim> Map<String, V>.pid() = firstNotNullOf { it.takeIf { it.key == "pid" } }.value
+
+private class CookieNotSetException : RuntimeException("Cookie with name selvbetjening-idtoken not found")

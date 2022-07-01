@@ -10,6 +10,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
+import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
 import io.mockk.mockk
 import kotlinx.serialization.encodeToString
@@ -64,6 +65,17 @@ class VarselApiTest {
         varselJson["totaltAntallUleste"].asInt() shouldBe 1
         varselJson["nyesteVarsler"].size() shouldBe 1
         varselJson["nyesteVarsler"][0]["varseltekst"].asText() shouldBe "Du har 1 varsel"
+    }
+
+    @Test
+    fun `gi 401 ved manglende cookie`() {
+        val response = withTestApplication(
+            mockVarselbjelleApi()
+        ) {
+            handleRequest(HttpMethod.Get, "rest/varsel/hentsiste")
+        }.response
+
+        response.status() shouldBe HttpStatusCode.Unauthorized
     }
 
 }
