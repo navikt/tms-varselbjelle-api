@@ -13,7 +13,8 @@ fun Route.varsel(notifikasjonConsumer: NotifikasjonConsumer, varselsideUrl: Stri
         val token = call.request.cookies["selvbetjening-idtoken"]!!
         val notifikasjoner = notifikasjonConsumer.getNotifikasjoner(token)
 
-        call.respond(HttpStatusCode.OK, SammendragsVarsel(notifikasjoner, varselsideUrl))
+        val sammendragsVarselDto =SammendragsVarsel(notifikasjoner, varselsideUrl).toDto()
+        call.respond(HttpStatusCode.OK, sammendragsVarselDto)
     }
 }
 
