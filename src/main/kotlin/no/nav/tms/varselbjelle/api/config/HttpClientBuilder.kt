@@ -12,7 +12,7 @@ object HttpClientBuilder {
     fun build(httpClientEngine: HttpClientEngine = Apache.create()): HttpClient {
         return HttpClient(httpClientEngine) {
             install(JsonFeature) {
-                serializer = KotlinxSerializer(jsonConfig())
+                serializer = KotlinxSerializer(jsonConfig(ignoreUnknownKeys = true))
             }
             install(HttpTimeout)
         }
