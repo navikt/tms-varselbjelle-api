@@ -33,7 +33,7 @@ class SammendragsVarselTest {
         varsel.varseltekst shouldBe "Du har 1 varsel"
         varsel.varselId shouldBe "ubruktId"
         varsel.url shouldBe varselsideUrl
-        varsel.meldingsType shouldBe "default"
+        varsel.meldingsType shouldBe "MELDING"
         varsel.datoOpprettet shouldBe forstbehandlet.toInstant().toEpochMilli().toString()
     }
 
