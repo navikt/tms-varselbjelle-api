@@ -40,6 +40,9 @@ data class SammendragsVarsel(private val notifikasjoner: List<Notifikasjon>, pri
 }
 
 @Serializable
+data class VarselbjelleResponse(val varsler: SammendragsVarselDto)
+
+@Serializable
 data class SammendragsVarselDto(val nyesteVarsler: List<Varsel>, val totaltAntallUleste: Int)
 
 @Serializable

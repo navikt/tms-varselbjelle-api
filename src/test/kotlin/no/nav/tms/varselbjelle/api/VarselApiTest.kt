@@ -62,9 +62,9 @@ class VarselApiTest {
 
         val varselJson = ObjectMapper().readTree(response.content)
 
-        varselJson["totaltAntallUleste"].asInt() shouldBe 1
-        varselJson["nyesteVarsler"].size() shouldBe 1
-        varselJson["nyesteVarsler"][0]["varseltekst"].asText() shouldBe "Du har 1 varsel"
+        varselJson["varsler"]["totaltAntallUleste"].asInt() shouldBe 1
+        varselJson["varsler"]["nyesteVarsler"].size() shouldBe 1
+        varselJson["varsler"]["nyesteVarsler"][0]["varseltekst"].asText() shouldBe "Du har 1 varsel"
     }
 
     @Test
