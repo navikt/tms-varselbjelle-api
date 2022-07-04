@@ -27,7 +27,7 @@ data class SammendragsVarsel(private val notifikasjoner: List<Notifikasjon>, pri
                     varseltekst = varseltekst,
                     varselId = "ubruktId",
                     id = 0L,
-                    meldingsType = "default",
+                    meldingsType = "MELDING",
                     datoOpprettet = notifikasjoner.minOf { it.forstBehandlet }.toInstant().toEpochMilli().toString(),
                     datoLest = notifikasjoner.minOf { it.forstBehandlet }.toInstant().toEpochMilli().toString()
                 )
