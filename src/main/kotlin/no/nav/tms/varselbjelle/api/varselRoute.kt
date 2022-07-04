@@ -18,7 +18,7 @@ fun Route.varsel(notifikasjonConsumer: NotifikasjonConsumer, varselsideUrl: Stri
         call.respond(HttpStatusCode.OK, varselbjelleResponse)
     }
 
-    post("/erlest/{id}") {
+    post("rest/varsel/erlest/{id}") {
         //dummy-endepunkt for at varselbjella ikke skal feile
         call.respond(HttpStatusCode.OK)
     }
