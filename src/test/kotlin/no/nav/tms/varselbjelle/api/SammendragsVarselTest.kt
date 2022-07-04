@@ -34,19 +34,19 @@ class SammendragsVarselTest {
         varsel.varselId shouldBe "ubruktId"
         varsel.url shouldBe varselsideUrl
         varsel.meldingsType shouldBe "default"
-        varsel.datoOpprettet shouldBe forstbehandlet
+        varsel.datoOpprettet shouldBe forstbehandlet.toInstant().toEpochMilli().toString()
     }
 
     @Test
     fun `konverterer liste av notifikasjoner til varselbjelle-varsel med tidligste dato`() {
-        val tidligsteNotifikasjonTidspunkt = ZonedDateTime.of(2019, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
+        val tidligsteNotifikasjonstidspunkt = ZonedDateTime.of(2019, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
         val sammendragsVarselDto = SammendragsVarsel(
             listOf(
                 Notifikasjon(
                     forstBehandlet = ZonedDateTime.of(2022, 2, 2, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
                 ),
                 Notifikasjon(
-                    forstBehandlet = tidligsteNotifikasjonTidspunkt
+                    forstBehandlet = tidligsteNotifikasjonstidspunkt
                 ),
                 Notifikasjon(
                     forstBehandlet = ZonedDateTime.of(2022, 3, 3, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
@@ -60,6 +60,6 @@ class SammendragsVarselTest {
 
         val varsel = sammendragsVarselDto.nyesteVarsler.first()
         varsel.varseltekst shouldBe "Du har 3 varsler"
-        varsel.datoOpprettet shouldBe tidligsteNotifikasjonTidspunkt
+        varsel.datoOpprettet shouldBe tidligsteNotifikasjonstidspunkt.toInstant().toEpochMilli().toString()
     }
 }

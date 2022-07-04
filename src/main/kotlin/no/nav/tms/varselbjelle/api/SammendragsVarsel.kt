@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.tms.varselbjelle.api.config.ZonedDateTimeSerializer
 import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
-import java.time.ZonedDateTime
 
 data class SammendragsVarsel(private val notifikasjoner: List<Notifikasjon>, private val varselsideUrl: String) {
     private val nyesteVarsler: List<Varsel>
@@ -29,8 +28,8 @@ data class SammendragsVarsel(private val notifikasjoner: List<Notifikasjon>, pri
                     varselId = "ubruktId",
                     id = 0L,
                     meldingsType = "default",
-                    datoOpprettet = notifikasjoner.minOf { it.forstBehandlet },
-                    datoLest = notifikasjoner.minOf { it.forstBehandlet }
+                    datoOpprettet = notifikasjoner.minOf { it.forstBehandlet }.toInstant().toEpochMilli().toString(),
+                    datoLest = notifikasjoner.minOf { it.forstBehandlet }.toInstant().toEpochMilli().toString()
                 )
             )
             totaltAntallUleste = 1
@@ -51,6 +50,6 @@ data class Varsel(
     val varselId: String,
     val id: Long,
     val meldingsType: String,
-    val datoOpprettet: ZonedDateTime,
-    val datoLest: ZonedDateTime
+    val datoOpprettet: String,
+    val datoLest: String
 )
