@@ -56,7 +56,7 @@ fun Application.varselbjelleApi(
             }
             validate { credentials ->
                 requireNotNull(credentials.payload.claims.pid()) {
-                    "Token må inneholde fødselsnummer for personen i enten pid claim"
+                    "Token må inneholde fødselsnummer for personen i pid claim"
                 }
 
                 JWTPrincipal(credentials.payload)
