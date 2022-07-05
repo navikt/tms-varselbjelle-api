@@ -18,9 +18,12 @@ import io.ktor.features.StatusPages
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.auth.HttpAuthHeader
+import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.response.respond
 import io.ktor.routing.routing
 import io.ktor.serialization.json
+import io.micrometer.prometheus.PrometheusConfig
+import io.micrometer.prometheus.PrometheusMeterRegistry
 import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.health.HealthService
 import no.nav.tms.varselbjelle.api.health.healthApi
@@ -73,6 +76,10 @@ fun Application.varselbjelleApi(
 
     install(ContentNegotiation) {
         json(jsonConfig())
+    }
+
+    install(MicrometerMetrics) {
+        registry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     }
 
     routing {
