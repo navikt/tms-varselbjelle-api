@@ -6,12 +6,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import no.nav.tms.varselbjelle.api.config.ZonedDateTimeSerializer
 import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
-import java.time.ZonedDateTime
 
-@Serializable
 data class SammendragsVarsel(private val notifikasjoner: List<Notifikasjon>, private val varselsideUrl: String) {
-    val nyesteVarsler: List<Varsel>
-    val totaltAntallUleste: Int
+    private val nyesteVarsler: List<Varsel>
+    private val totaltAntallUleste: Int
 
     init {
         val varseltekst =
@@ -29,15 +27,23 @@ data class SammendragsVarsel(private val notifikasjoner: List<Notifikasjon>, pri
                     varseltekst = varseltekst,
                     varselId = "ubruktId",
                     id = 0L,
-                    meldingsType = "default",
-                    datoOpprettet = notifikasjoner.minOf { it.forstBehandlet },
-                    datoLest = notifikasjoner.minOf { it.forstBehandlet })
+                    meldingsType = "MELDING",
+                    datoOpprettet = notifikasjoner.minOf { it.forstBehandlet }.toInstant().toEpochMilli().toString(),
+                    datoLest = notifikasjoner.minOf { it.forstBehandlet }.toInstant().toEpochMilli().toString()
+                )
             )
             totaltAntallUleste = 1
         }
     }
 
+    fun toDto() = SammendragsVarselDto(nyesteVarsler, totaltAntallUleste)
 }
+
+@Serializable
+data class VarselbjelleResponse(val varsler: SammendragsVarselDto)
+
+@Serializable
+data class SammendragsVarselDto(val nyesteVarsler: List<Varsel>, val totaltAntallUleste: Int)
 
 @Serializable
 data class Varsel(
@@ -47,6 +53,6 @@ data class Varsel(
     val varselId: String,
     val id: Long,
     val meldingsType: String,
-    val datoOpprettet: ZonedDateTime,
-    val datoLest: ZonedDateTime
+    val datoOpprettet: String,
+    val datoLest: String
 )
