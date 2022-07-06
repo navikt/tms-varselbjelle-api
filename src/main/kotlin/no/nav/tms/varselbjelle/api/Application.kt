@@ -37,6 +37,7 @@ fun main() {
             healthService = healthService,
             httpClient = httpClient,
             corsAllowedOrigins = environment.corsAllowedOrigins,
+            corsAllowedSchemes = environment.corsAllowedSchemes,
             notifikasjonConsumer = notifikasjonConsumer,
             varselsideUrl = environment.varselsideUrl
         )
