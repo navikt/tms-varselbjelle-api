@@ -38,6 +38,7 @@ fun main() {
             httpClient = httpClient,
             corsAllowedOrigins = environment.corsAllowedOrigins,
             corsAllowedSchemes = environment.corsAllowedSchemes,
+            corsAllowedHeaders = environment.corsAllowedHeaders,
             notifikasjonConsumer = notifikasjonConsumer,
             varselsideUrl = environment.varselsideUrl
         )
