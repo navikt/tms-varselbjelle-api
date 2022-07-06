@@ -38,6 +38,7 @@ fun Application.varselbjelleApi(
     httpClient: HttpClient,
     corsAllowedOrigins: String,
     corsAllowedSchemes: String,
+    corsAllowedHeaders: List<String>,
     notifikasjonConsumer: NotifikasjonConsumer,
     varselsideUrl: String
 ) {
@@ -48,6 +49,9 @@ fun Application.varselbjelleApi(
         host(corsAllowedOrigins, schemes = listOf(corsAllowedSchemes))
         allowCredentials = true
         header(HttpHeaders.ContentType)
+        corsAllowedHeaders.forEach { approvedHeader ->
+            header(approvedHeader)
+        }
     }
 
     install(Authentication) {

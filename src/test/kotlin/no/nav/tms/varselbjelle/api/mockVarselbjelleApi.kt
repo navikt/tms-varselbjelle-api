@@ -20,6 +20,7 @@ fun mockVarselbjelleApi(
     httpClient: HttpClient = mockk(relaxed = true),
     corsAllowedOrigins: String = "*.nav.no",
     corsAllowedSchemes: String = "https",
+    corsAllowedHeaders: List<String> = listOf(""),
     notifikasjonConsumer: NotifikasjonConsumer = mockk(relaxed = true),
     varselsideUrl: String = "localhost"
 ): Application.() -> Unit {
@@ -32,6 +33,7 @@ fun mockVarselbjelleApi(
             httpClient = httpClient,
             corsAllowedOrigins = corsAllowedOrigins,
             corsAllowedSchemes = corsAllowedSchemes,
+            corsAllowedHeaders = corsAllowedHeaders,
             notifikasjonConsumer = notifikasjonConsumer,
             varselsideUrl = varselsideUrl
         )
