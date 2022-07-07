@@ -55,7 +55,7 @@ class VarselApiTest {
                 notifikasjonConsumer = notifikasjonConsumer
             )
         ) {
-            autentisert(HttpMethod.Get, "rest/varsel/hentsiste")
+            autentisert(HttpMethod.Get, "tms-varselbjelle-api/rest/varsel/hentsiste")
         }.response
 
         response.status() shouldBe HttpStatusCode.OK
@@ -72,7 +72,7 @@ class VarselApiTest {
         val response = withTestApplication(
             mockVarselbjelleApi()
         ) {
-            handleRequest(HttpMethod.Get, "rest/varsel/hentsiste")
+            handleRequest(HttpMethod.Get, "tms-varselbjelle-api/rest/varsel/hentsiste")
         }.response
 
         response.status() shouldBe HttpStatusCode.Unauthorized

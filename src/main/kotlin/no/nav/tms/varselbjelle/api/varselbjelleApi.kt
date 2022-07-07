@@ -20,6 +20,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.metrics.micrometer.MicrometerMetrics
 import io.ktor.response.respond
+import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.serialization.json
 import io.micrometer.prometheus.PrometheusConfig
@@ -83,11 +84,13 @@ fun Application.varselbjelleApi(
         registry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
     }
 
-    routing {
-        healthApi(healthService)
+    routing() {
+        route("/tms-varselbjelle-api") {
+            healthApi(healthService)
 
-        authenticate {
-            varsel(notifikasjonConsumer, varselsideUrl)
+            authenticate {
+                varsel(notifikasjonConsumer, varselsideUrl)
+            }
         }
     }
 
