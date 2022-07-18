@@ -1,6 +1,6 @@
 package no.nav.tms.varselbjelle.api
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
@@ -13,6 +13,7 @@ import io.ktor.http.headersOf
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
 import io.mockk.mockk
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import no.nav.tms.varselbjelle.api.config.HttpClientBuilder
@@ -60,11 +61,10 @@ class VarselApiTest {
 
         response.status() shouldBe HttpStatusCode.OK
 
-        val varselJson = ObjectMapper().readTree(response.content)
-
-        varselJson["varsler"]["totaltAntallUleste"].asInt() shouldBe 1
-        varselJson["varsler"]["nyesteVarsler"].size() shouldBe 1
-        varselJson["varsler"]["nyesteVarsler"][0]["varseltekst"].asText() shouldBe "Du har 1 varsel"
+        val sammendragsVarselDto = Json.decodeFromString<VarselbjelleResponse>(response.content!!)
+        sammendragsVarselDto.varsler.totaltAntallUleste shouldBe 1
+        sammendragsVarselDto.varsler.nyesteVarsler shouldHaveSize 1
+        sammendragsVarselDto.varsler.nyesteVarsler.first().varseltekst shouldBe "Du har 1 varsel"
     }
 
     @Test
@@ -77,5 +77,4 @@ class VarselApiTest {
 
         response.status() shouldBe HttpStatusCode.Unauthorized
     }
-
 }

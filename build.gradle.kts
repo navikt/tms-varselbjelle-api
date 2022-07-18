@@ -32,8 +32,7 @@ dependencies {
     implementation(Ktor.serverNetty)
     implementation(Ktor.serialization)
     implementation(Ktor.metricsMicrometer)
-    implementation(Logback.classic)
-    implementation(Logstash.logbackEncoder)
+    implementation("io.github.microutils:kotlin-logging:2.1.23")
     implementation("com.github.navikt.tms-ktor-token-support:token-support-tokendings-exchange:2022.01.27-13.11-a6b55dd90347")
     implementation(Micrometer.registryPrometheus)
 

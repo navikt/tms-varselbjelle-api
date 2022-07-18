@@ -19,15 +19,19 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.metrics.micrometer.MicrometerMetrics
+import io.ktor.request.path
 import io.ktor.response.respond
 import io.ktor.routing.route
 import io.ktor.routing.routing
 import io.ktor.serialization.json
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
+import mu.KotlinLogging
 import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.health.healthApi
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
+
+private val logger = KotlinLogging.logger { }
 
 fun Application.varselbjelleApi(
     jwkProvider: JwkProvider,
@@ -75,6 +79,11 @@ fun Application.varselbjelleApi(
         exception<CookieNotSetException> { cause ->
             val status = HttpStatusCode.Unauthorized
             call.respond(status, cause.message ?: "")
+        }
+
+        exception<Throwable> { cause ->
+            logger.error(cause) { "Kall mot ${call.request.path()} feilet. Feilmelding: ${cause.message}" }
+            call.respond(HttpStatusCode.InternalServerError)
         }
     }
 
