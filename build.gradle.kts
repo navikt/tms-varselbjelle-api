@@ -1,40 +1,32 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    // Apply the Kotlin JVM plugin to add support for Kotlin on the JVM.
     kotlin("jvm").version(Kotlin.version)
-    kotlin("plugin.allopen").version(Kotlin.version)
     kotlin("plugin.serialization").version(Kotlin.version)
 
     id(Shadow.pluginId) version (Shadow.version)
-    // Apply the application plugin to add support for building a CLI application.
     application
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+kotlin {
+    jvmToolchain {
+        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 repositories {
     mavenCentral()
-    maven("https://packages.confluent.io/maven")
     maven("https://jitpack.io")
-    mavenLocal()
 }
 
 dependencies {
-    implementation(DittNAV.Common.logging)
     implementation(DittNAV.Common.securityAuthenticatedUser)
     implementation(DittNAV.Common.utils)
-    implementation(Kotlinx.coroutines)
     implementation(Kotlinx.htmlJvm)
     implementation(Ktor.auth)
     implementation(Ktor.authJwt)
     implementation(Ktor.clientApache)
     implementation(Ktor.clientJson)
-    implementation(Ktor.clientLogging)
-    implementation(Ktor.clientLoggingJvm)
     implementation(Ktor.clientSerializationJvm)
     implementation(Ktor.htmlBuilder)
     implementation(Ktor.serverNetty)
@@ -45,14 +37,12 @@ dependencies {
     implementation("com.github.navikt.tms-ktor-token-support:token-support-tokendings-exchange:2022.01.27-13.11-a6b55dd90347")
     implementation(Micrometer.registryPrometheus)
 
-    testImplementation(Junit.api)
+    testImplementation(kotlin("test"))
     testImplementation(Kotest.assertionsCore)
     testImplementation(Kotest.runnerJunit5)
     testImplementation(Ktor.clientMock)
     testImplementation(Ktor.serverTestHost)
     testImplementation(Mockk.mockk)
-
-    testRuntimeOnly(Junit.engine)
 }
 
 application {
