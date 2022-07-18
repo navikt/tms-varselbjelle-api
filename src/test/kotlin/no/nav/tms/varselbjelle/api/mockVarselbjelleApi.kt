@@ -8,7 +8,6 @@ import io.ktor.server.testing.TestApplicationEngine
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.setBody
 import io.mockk.mockk
-import no.nav.tms.varselbjelle.api.health.HealthService
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 
 private const val testIssuer = "test-issuer"
@@ -16,7 +15,6 @@ private val jwtStub = JwtStub(testIssuer)
 private val stubToken = jwtStub.createTokenFor("subject", "audience")
 
 fun mockVarselbjelleApi(
-    healthService: HealthService = mockk(relaxed = true),
     httpClient: HttpClient = mockk(relaxed = true),
     corsAllowedOrigins: String = "*.nav.no",
     corsAllowedSchemes: String = "https",
@@ -29,7 +27,6 @@ fun mockVarselbjelleApi(
             jwkProvider = jwtStub.stubbedJwkProvider(),
             jwtIssuer = testIssuer,
             jwtAudience = "audience",
-            healthService = healthService,
             httpClient = httpClient,
             corsAllowedOrigins = corsAllowedOrigins,
             corsAllowedSchemes = corsAllowedSchemes,
@@ -47,8 +44,6 @@ fun TestApplicationEngine.autentisert(
     body: String? = null
 ) = handleRequest(httpMethod, endepunkt) {
     addHeader(HttpHeaders.ContentType, "application/json")
-
     addHeader(HttpHeaders.Cookie, "selvbetjening-idtoken=$token")
-
     body?.also { setBody(it) }
 }

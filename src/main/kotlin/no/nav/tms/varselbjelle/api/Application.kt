@@ -6,22 +6,18 @@ import io.ktor.server.netty.Netty
 import no.nav.tms.token.support.tokendings.exchange.TokendingsServiceBuilder
 import no.nav.tms.varselbjelle.api.config.Environment
 import no.nav.tms.varselbjelle.api.config.HttpClientBuilder
-import no.nav.tms.varselbjelle.api.health.HealthService
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 import no.nav.tms.varselbjelle.api.tokenx.EventhandlerTokendings
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
 fun main() {
-
-    val httpClient = HttpClientBuilder.build()
-    val healthService = HealthService()
-
     val environment = Environment()
 
     val tokendingsService = TokendingsServiceBuilder.buildTokendingsService()
     val eventhandlerTokendings = EventhandlerTokendings(tokendingsService, environment.eventhandlerClientId)
 
+    val httpClient = HttpClientBuilder.build()
     val notifikasjonConsumer = NotifikasjonConsumer(httpClient, eventhandlerTokendings, environment.eventHandlerURL)
 
     val jwkProvider = JwkProviderBuilder(URL(environment.jwksUrl))
@@ -34,7 +30,6 @@ fun main() {
             jwkProvider = jwkProvider,
             jwtIssuer = environment.jwksIssuer,
             jwtAudience = environment.loginserviceIdportenAudience,
-            healthService = healthService,
             httpClient = httpClient,
             corsAllowedOrigins = environment.corsAllowedOrigins,
             corsAllowedSchemes = environment.corsAllowedSchemes,
@@ -43,5 +38,4 @@ fun main() {
             varselsideUrl = environment.varselsideUrl
         )
     }.start(wait = true)
-
 }

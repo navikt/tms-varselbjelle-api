@@ -26,7 +26,6 @@ import io.ktor.serialization.json
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import no.nav.tms.varselbjelle.api.config.jsonConfig
-import no.nav.tms.varselbjelle.api.health.HealthService
 import no.nav.tms.varselbjelle.api.health.healthApi
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 
@@ -34,7 +33,6 @@ fun Application.varselbjelleApi(
     jwkProvider: JwkProvider,
     jwtIssuer: String,
     jwtAudience: String,
-    healthService: HealthService,
     httpClient: HttpClient,
     corsAllowedOrigins: String,
     corsAllowedSchemes: String,
@@ -90,7 +88,7 @@ fun Application.varselbjelleApi(
 
     routing() {
         route("/tms-varselbjelle-api") {
-            healthApi(healthService)
+            healthApi()
 
             authenticate {
                 varsel(notifikasjonConsumer, varselsideUrl)
