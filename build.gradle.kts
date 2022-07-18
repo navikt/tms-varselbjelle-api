@@ -27,7 +27,6 @@ dependencies {
     implementation(DittNAV.Common.logging)
     implementation(DittNAV.Common.securityAuthenticatedUser)
     implementation(DittNAV.Common.utils)
-    implementation(Jackson.dataTypeJsr310)
     implementation(Kotlinx.coroutines)
     implementation(Kotlinx.htmlJvm)
     implementation(Ktor.auth)
