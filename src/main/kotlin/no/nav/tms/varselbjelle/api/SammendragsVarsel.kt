@@ -1,10 +1,6 @@
-@file:UseSerializers(ZonedDateTimeSerializer::class)
-
 package no.nav.tms.varselbjelle.api
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
-import no.nav.tms.varselbjelle.api.config.ZonedDateTimeSerializer
 import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
 
 data class SammendragsVarsel(private val notifikasjoner: List<Notifikasjon>, private val varselsideUrl: String) {
