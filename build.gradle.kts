@@ -46,16 +46,12 @@ dependencies {
     implementation(Micrometer.registryPrometheus)
 
     testImplementation(Junit.api)
-    testImplementation(Ktor.serverTestHost)
-    testImplementation(Kotest.runnerJunit5)
     testImplementation(Kotest.assertionsCore)
-    testImplementation(Mockk.mockk)
-    testImplementation(Jjwt.api)
+    testImplementation(Kotest.runnerJunit5)
     testImplementation(Ktor.clientMock)
+    testImplementation(Ktor.serverTestHost)
+    testImplementation(Mockk.mockk)
 
-    testRuntimeOnly(Bouncycastle.bcprovJdk15on)
-    testRuntimeOnly(Jjwt.impl)
-    testRuntimeOnly(Jjwt.jackson)
     testRuntimeOnly(Junit.engine)
 }
 
@@ -64,9 +60,11 @@ application {
 }
 
 tasks {
-    withType<Test> {
+    test {
         useJUnitPlatform()
         testLogging {
+            showExceptions = true
+            showStackTraces = true
             exceptionFormat = TestExceptionFormat.FULL
             events("passed", "skipped", "failed")
         }
