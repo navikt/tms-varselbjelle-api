@@ -22,13 +22,11 @@ repositories {
 dependencies {
     implementation(DittNAV.Common.securityAuthenticatedUser)
     implementation(DittNAV.Common.utils)
-    implementation(Kotlinx.htmlJvm)
     implementation(Ktor.auth)
     implementation(Ktor.authJwt)
     implementation(Ktor.clientApache)
     implementation(Ktor.clientJson)
     implementation(Ktor.clientSerializationJvm)
-    implementation(Ktor.htmlBuilder)
     implementation(Ktor.serverNetty)
     implementation(Ktor.serialization)
     implementation(Ktor.metricsMicrometer)
