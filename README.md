@@ -1,6 +1,6 @@
 # tms-varselbjelle-api
 
-Api for å vise notifikasjoner i varselbjellen
+Api for å vise notifikasjoner i varselbjellen.
 
 # Henvendelser
 
