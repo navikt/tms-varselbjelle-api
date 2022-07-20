@@ -30,11 +30,10 @@ jobs:
         with:
           java-version: '17.x'
 
-      - name: Bygg prosjekt
-        uses: navikt/pb-common-gh-actions/build@v2
+      - name: Build
+        uses: gradle/gradle-build-action@v2
         with:
-          SKIP_TESTS: "true"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          arguments: --configuration-cache build installDist
 
       - name: Bygg, tag og push Docker image
         uses: navikt/pb-common-gh-actions/docker-publish@v2
