@@ -16,8 +16,7 @@ ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH "${JAVA_HOME}/bin:${PATH}"
 COPY --from=jre-build /javaruntime $JAVA_HOME
 
-RUN mkdir /opt/app
-COPY build/libs/*.jar /opt/app/app.jar
+COPY build/install/* /
 
 USER nobody
-CMD ["java", "-jar", "/opt/app/app.jar"]
+CMD ["dp-data-inntekt"]
