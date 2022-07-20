@@ -14,29 +14,16 @@ jobs:
     outputs:
         image: ${{ env.IMAGE }}
     steps:
+      - uses: actions/checkout@v3
 
-      - name: Sjekk ut koden
-        uses: actions/checkout@v2
-
-      - name: Setup java
-        uses: actions/setup-java@v1
+      - uses: actions/setup-java@v2
         with:
-          java-version: '17.x'
+          distribution: temurin
+          java-version: 17
 
-      - name: Finn cache-variabler
-        uses: navikt/pb-common-gh-actions/cache-prep@v2
-
-      - name: Sett opp cache
-        uses: actions/cache@v2
+      - uses: gradle/gradle-build-action@v2
         with:
-          path: |
-            ${{ env.CACHE_PATHS }}
-          key: ${{ runner.os }}${{ env.CACHE_KEY_NAMESPACE }}${{ hashFiles(env.CACHE_KEY_HASHED_PATH) }}
-
-      - name: Bygg prosjekt og kjør tester
-        uses: navikt/pb-common-gh-actions/build@v2
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          arguments: --configuration-cache build installDist
 
       - name: Bygg, tag og push Docker image
         uses: navikt/pb-common-gh-actions/docker-publish@v2
@@ -59,15 +46,10 @@ jobs:
       matrix:
         cluster: [dev-gcp, prod-gcp]
     steps:
-      - name: Sjekk ut koden
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: 'Sjekk om deploy til ${{ matrix.cluster }} er mulig'
-        run: echo "DEPLOY_CONFIG_DEFINED=$([[ -f ./nais/${{ matrix.cluster }}/nais.yaml ]] && echo 'true' || echo 'false')" >> $GITHUB_ENV
-
-      - name: 'Deploy-er til ${{ matrix.cluster }}'
-        if: env.DEPLOY_CONFIG_DEFINED == 'true'
-        uses: 'nais/deploy/actions/deploy@v1'
+      - name: Deploy-er til ${{ matrix.cluster }}
+        uses: nais/deploy/actions/deploy@v1
         env:
           REF: ${{ github.sha }}
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
