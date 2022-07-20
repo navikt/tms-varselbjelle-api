@@ -4,7 +4,6 @@ plugins {
     kotlin("jvm").version(Kotlin.version)
     kotlin("plugin.serialization").version(Kotlin.version)
 
-    id(Shadow.pluginId) version (Shadow.version)
     application
 }
 
@@ -58,4 +57,15 @@ tasks {
     }
 }
 
-apply(plugin = Shadow.pluginId)
+tasks.withType<Jar>().configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes(mapOf("Main-Class" to application.mainClass.get()))
+    }
+
+    from(
+        configurations.runtimeClasspath.get().map {
+            if (it.isDirectory) it else zipTree(it)
+        }
+    )
+}
