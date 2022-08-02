@@ -28,6 +28,7 @@ spec:
         - application: dittnav-event-handler
   ingresses:
     - "https://person.nav.no/tms-varselbjelle-api"
+    - "https://www.nav.no/tms-varselbjelle-api"
   resources:
     limits:
       cpu: "1"
