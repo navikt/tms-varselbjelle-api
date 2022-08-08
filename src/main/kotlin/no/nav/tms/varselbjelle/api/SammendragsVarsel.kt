@@ -24,8 +24,8 @@ data class SammendragsVarsel(private val notifikasjoner: List<Notifikasjon>, pri
                     varselId = "ubruktId",
                     id = 0L,
                     meldingsType = "MELDING",
-                    datoOpprettet = notifikasjoner.minOf { it.forstBehandlet }.toInstant().toEpochMilli().toString(),
-                    datoLest = notifikasjoner.minOf { it.forstBehandlet }.toInstant().toEpochMilli().toString()
+                    datoOpprettet = notifikasjoner.maxOf { it.forstBehandlet }.toInstant().toEpochMilli().toString(),
+                    datoLest = notifikasjoner.maxOf { it.forstBehandlet }.toInstant().toEpochMilli().toString()
                 )
             )
             totaltAntallUleste = 1
