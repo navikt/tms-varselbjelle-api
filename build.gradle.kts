@@ -21,6 +21,7 @@ repositories {
 dependencies {
     implementation(DittNAV.Common.securityAuthenticatedUser)
     implementation(DittNAV.Common.utils)
+    implementation(DittNAV.Common.logging)
     implementation(Ktor.auth)
     implementation(Ktor.authJwt)
     implementation(Ktor.clientApache)
