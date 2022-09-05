@@ -44,6 +44,7 @@ fun Application.varselbjelleApi(
     notifikasjonConsumer: NotifikasjonConsumer,
     varselsideUrl: String
 ) {
+    val collectorRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
     install(DefaultHeaders)
 
@@ -92,12 +93,12 @@ fun Application.varselbjelleApi(
     }
 
     install(MicrometerMetrics) {
-        registry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+        registry = collectorRegistry
     }
 
     routing() {
         route("/tms-varselbjelle-api") {
-            healthApi()
+            healthApi(collectorRegistry)
 
             authenticate {
                 varsel(notifikasjonConsumer, varselsideUrl)
