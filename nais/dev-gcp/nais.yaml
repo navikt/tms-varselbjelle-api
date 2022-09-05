@@ -17,6 +17,9 @@ spec:
   readiness:
     path: /tms-varselbjelle-api/internal/isReady
     initialDelay: 10
+  prometheus:
+    enabled: true
+    path: /tms-varselbjelle-api/metrics
   replicas:
     min: 2
     max: 4
