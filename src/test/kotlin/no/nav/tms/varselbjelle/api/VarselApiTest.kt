@@ -5,18 +5,37 @@ import io.kotest.matchers.shouldBe
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.request.cookie
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.request
+import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import io.ktor.http.headersOf
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.call
+import io.ktor.server.application.install
+import io.ktor.server.config.MapApplicationConfig
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.response.respond
+import io.ktor.server.routing.get
+import io.ktor.server.routing.routing
 import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.testApplication
 import io.ktor.server.testing.withTestApplication
 import io.mockk.mockk
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import no.nav.tms.varselbjelle.api.config.HttpClientBuilder
+import no.nav.tms.varselbjelle.api.config.get
+import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 import no.nav.tms.varselbjelle.api.tokenx.EventhandlerTokendings
@@ -34,47 +53,54 @@ class VarselApiTest {
                 forstBehandlet = ZonedDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo")),
             )
         )
-
-        val notifikasjonHttpClient: HttpClient = HttpClientBuilder.build(MockEngine {
-            respond(
-                Json.encodeToString(notifikasjoner),
-                HttpStatusCode.OK,
-                headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-            )
-        })
+        val eventhandlerTestUrl = "https://test.eventhandler.no"
+        val notifikasjonHttpClient: HttpClient = HttpClientBuilder.build()
 
         val eventhandlerTokendings: EventhandlerTokendings = mockk(relaxed = true)
-        val notifikasjonConsumer = NotifikasjonConsumer(
-            client = notifikasjonHttpClient,
-            eventhandlerTokendings = eventhandlerTokendings,
-            eventHandlerBaseURL = "http://localhost"
-        )
 
-        val response = withTestApplication(
+        testApplication {
+            externalServices {
+                hosts(eventhandlerTestUrl) {
+                    install(ContentNegotiation) { json() }
+                    routing {
+                        get("fetch/event/aktive") {
+                            call.respond(HttpStatusCode.OK, notifikasjoner)
+                        }
+                    }
+                }
+            }
+
+            val notifikasjonClient = createClient {
+                install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
+                    json(jsonConfig())
+                }
+                install(HttpTimeout)
+            }
+            val notifikasjonConsumer = NotifikasjonConsumer(
+                client = notifikasjonClient,
+                eventhandlerTokendings = eventhandlerTokendings,
+                eventHandlerBaseURL = eventhandlerTestUrl
+            )
             mockVarselbjelleApi(
                 httpClient = notifikasjonHttpClient,
                 notifikasjonConsumer = notifikasjonConsumer
             )
-        ) {
-            autentisert(HttpMethod.Get, "tms-varselbjelle-api/rest/varsel/hentsiste")
-        }.response
+            val response = client.authenticatedGet("tms-varselbjelle-api/rest/varsel/hentsiste")
 
-        response.status() shouldBe HttpStatusCode.OK
-
-        val sammendragsVarselDto = Json.decodeFromString<VarselbjelleResponse>(response.content!!)
-        sammendragsVarselDto.varsler.totaltAntallUleste shouldBe 1
-        sammendragsVarselDto.varsler.nyesteVarsler shouldHaveSize 1
-        sammendragsVarselDto.varsler.nyesteVarsler.first().varseltekst shouldBe "Du har 1 varsel"
+            response.status shouldBe HttpStatusCode.OK
+            val sammendragsVarselDto = Json.decodeFromString<VarselbjelleResponse>(response.bodyAsText())
+            sammendragsVarselDto.varsler.totaltAntallUleste shouldBe 1
+            sammendragsVarselDto.varsler.nyesteVarsler shouldHaveSize 1
+            sammendragsVarselDto.varsler.nyesteVarsler.first().varseltekst shouldBe "Du har 1 varsel"
+        }
     }
 
     @Test
     fun `gi 401 ved manglende cookie`() {
-        val response = withTestApplication(
+        testApplication {
             mockVarselbjelleApi()
-        ) {
-            handleRequest(HttpMethod.Get, "tms-varselbjelle-api/rest/varsel/hentsiste")
-        }.response
+            client.get("tms-varselbjelle-api/rest/varsel/hentsiste").status shouldBe HttpStatusCode.Unauthorized
+        }
 
-        response.status() shouldBe HttpStatusCode.Unauthorized
     }
 }

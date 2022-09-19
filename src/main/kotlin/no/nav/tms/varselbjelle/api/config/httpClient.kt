@@ -1,15 +1,34 @@
 package no.nav.tms.varselbjelle.api.config
 
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.apache.Apache
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.client.request.url
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import no.nav.tms.varselbjelle.api.tokenx.AccessToken
 import java.net.URL
+
+object HttpClientBuilder {
+
+    fun build(httpClientEngine: HttpClientEngine = Apache.create()): HttpClient {
+        return HttpClient(httpClientEngine) {
+            install(ContentNegotiation) {
+                json(jsonConfig())
+            }
+            install(HttpTimeout)
+        }
+    }
+
+}
 
 suspend inline fun <reified T> HttpClient.get(url: URL, accessToken: AccessToken): T = withContext(Dispatchers.IO) {
     request {
@@ -17,4 +36,6 @@ suspend inline fun <reified T> HttpClient.get(url: URL, accessToken: AccessToken
         method = HttpMethod.Get
         header(HttpHeaders.Authorization, "Bearer ${accessToken.value}")
     }
-}
+}.body()
+
+

@@ -2,45 +2,40 @@ package no.nav.tms.varselbjelle.api
 
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwt.interfaces.Claim
-import io.ktor.application.Application
-import io.ktor.application.ApplicationStopping
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.auth.Authentication
-import io.ktor.auth.authenticate
-import io.ktor.auth.jwt.JWTPrincipal
-import io.ktor.auth.jwt.jwt
 import io.ktor.client.HttpClient
-import io.ktor.features.CORS
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.DefaultHeaders
-import io.ktor.features.StatusPages
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.auth.HttpAuthHeader
-import io.ktor.metrics.micrometer.MicrometerMetrics
-import io.ktor.request.path
-import io.ktor.response.respond
-import io.ktor.routing.route
-import io.ktor.routing.routing
-import io.ktor.serialization.json
+import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.Application
+import io.ktor.server.application.ApplicationStopping
+import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.authenticate
+import io.ktor.server.auth.jwt.JWTPrincipal
+import io.ktor.server.auth.jwt.jwt
+import io.ktor.server.metrics.micrometer.MicrometerMetrics
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.plugins.cors.routing.CORS
+import io.ktor.server.plugins.defaultheaders.DefaultHeaders
+import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.response.respond
+import io.ktor.server.routing.route
+import io.ktor.server.routing.routing
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
-import mu.KotlinLogging
 import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.health.healthApi
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 
-private val logger = KotlinLogging.logger { }
 
 fun Application.varselbjelleApi(
     jwkProvider: JwkProvider,
     jwtIssuer: String,
     jwtAudience: String,
     httpClient: HttpClient,
-    corsAllowedOrigins: String,
-    corsAllowedSchemes: String,
-    corsAllowedHeaders: List<String>,
+    //corsAllowedOrigins: String,
+    //corsAllowedSchemes: String,
+    //corsAllowedHeaders: List<String>,
     notifikasjonConsumer: NotifikasjonConsumer,
     varselsideUrl: String
 ) {
@@ -48,13 +43,22 @@ fun Application.varselbjelleApi(
 
     install(DefaultHeaders)
 
-    install(CORS) {
-        host(corsAllowedOrigins, schemes = listOf(corsAllowedSchemes))
-        allowCredentials = true
-        header(HttpHeaders.ContentType)
-        corsAllowedHeaders.forEach { approvedHeader ->
-            header(approvedHeader)
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            when (cause) {
+                is CookieNotSetException -> call.respond(HttpStatusCode.Unauthorized)
+            }
         }
+
+    }
+
+    install(CORS) {
+        /*   host(corsAllowedOrigins, schemes = listOf(corsAllowedSchemes))
+           allowCredentials = true
+           header(HttpHeaders.ContentType)
+           corsAllowedHeaders.forEach { approvedHeader ->
+               header(approvedHeader)
+           }*/
     }
 
     install(Authentication) {
@@ -73,18 +77,6 @@ fun Application.varselbjelleApi(
 
                 JWTPrincipal(credentials.payload)
             }
-        }
-    }
-
-    install(StatusPages) {
-        exception<CookieNotSetException> { cause ->
-            val status = HttpStatusCode.Unauthorized
-            call.respond(status, cause.message ?: "")
-        }
-
-        exception<Throwable> { cause ->
-            logger.error(cause) { "Kall mot ${call.request.path()} feilet. Feilmelding: ${cause.message}" }
-            call.respond(HttpStatusCode.InternalServerError)
         }
     }
 
