@@ -26,6 +26,8 @@ import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
+import io.ktor.server.testing.ApplicationTestBuilder
+import io.ktor.server.testing.TestApplicationBuilder
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.testApplication
 import io.ktor.server.testing.withTestApplication
@@ -70,14 +72,8 @@ class VarselApiTest {
                 }
             }
 
-            val notifikasjonClient = createClient {
-                install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
-                    json(jsonConfig())
-                }
-                install(HttpTimeout)
-            }
             val notifikasjonConsumer = NotifikasjonConsumer(
-                client = notifikasjonClient,
+                client = applicationHttpClient(),
                 eventhandlerTokendings = eventhandlerTokendings,
                 eventHandlerBaseURL = eventhandlerTestUrl
             )
@@ -104,3 +100,12 @@ class VarselApiTest {
 
     }
 }
+
+private fun ApplicationTestBuilder.applicationHttpClient() =
+    createClient {
+        install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
+            json(jsonConfig())
+        }
+        install(HttpTimeout)
+    }
+

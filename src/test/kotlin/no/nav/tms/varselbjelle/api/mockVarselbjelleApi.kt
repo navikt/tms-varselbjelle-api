@@ -34,9 +34,9 @@ fun TestApplicationBuilder.mockVarselbjelleApi(
             jwtIssuer = testIssuer,
             jwtAudience = "audience",
             httpClient = httpClient,
-            //corsAllowedOrigins = corsAllowedOrigins,
-            //corsAllowedSchemes = corsAllowedSchemes,
-            //corsAllowedHeaders = corsAllowedHeaders,
+            corsAllowedOrigins = corsAllowedOrigins,
+            corsAllowedSchemes = corsAllowedSchemes,
+            corsAllowedHeaders = corsAllowedHeaders,
             notifikasjonConsumer = notifikasjonConsumer,
             varselsideUrl = varselsideUrl
         )

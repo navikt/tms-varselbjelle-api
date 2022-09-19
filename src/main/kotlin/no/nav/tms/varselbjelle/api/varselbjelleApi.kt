@@ -3,6 +3,7 @@ package no.nav.tms.varselbjelle.api
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwt.interfaces.Claim
 import io.ktor.client.HttpClient
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.serialization.kotlinx.json.json
@@ -33,9 +34,9 @@ fun Application.varselbjelleApi(
     jwtIssuer: String,
     jwtAudience: String,
     httpClient: HttpClient,
-    //corsAllowedOrigins: String,
-    //corsAllowedSchemes: String,
-    //corsAllowedHeaders: List<String>,
+    corsAllowedOrigins: String,
+    corsAllowedSchemes: String,
+    corsAllowedHeaders: List<String>,
     notifikasjonConsumer: NotifikasjonConsumer,
     varselsideUrl: String
 ) {
@@ -47,18 +48,19 @@ fun Application.varselbjelleApi(
         exception<Throwable> { call, cause ->
             when (cause) {
                 is CookieNotSetException -> call.respond(HttpStatusCode.Unauthorized)
+                else -> call.respond(HttpStatusCode.InternalServerError)
             }
         }
 
     }
 
     install(CORS) {
-        /*   host(corsAllowedOrigins, schemes = listOf(corsAllowedSchemes))
-           allowCredentials = true
-           header(HttpHeaders.ContentType)
-           corsAllowedHeaders.forEach { approvedHeader ->
-               header(approvedHeader)
-           }*/
+        allowCredentials = true
+        allowHost(corsAllowedOrigins, schemes = listOf(corsAllowedSchemes))
+        allowHeader(HttpHeaders.ContentType)
+        corsAllowedHeaders.forEach { approvedHeader ->
+            allowHeader(approvedHeader)
+        }
     }
 
     install(Authentication) {

@@ -31,9 +31,9 @@ fun main() {
             jwtIssuer = environment.jwksIssuer,
             jwtAudience = environment.loginserviceIdportenAudience,
             httpClient = httpClient,
-           // corsAllowedOrigins = environment.corsAllowedOrigins,
-           // corsAllowedSchemes = environment.corsAllowedSchemes,
-           // corsAllowedHeaders = environment.corsAllowedHeaders,
+            corsAllowedOrigins = environment.corsAllowedOrigins,
+            corsAllowedSchemes = environment.corsAllowedSchemes,
+            corsAllowedHeaders = environment.corsAllowedHeaders,
             notifikasjonConsumer = notifikasjonConsumer,
             varselsideUrl = environment.varselsideUrl
         )
