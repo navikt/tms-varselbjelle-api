@@ -46,7 +46,6 @@ dependencies {
     testImplementation(kotlin("test"))
     testImplementation(Kotest.assertionsCore)
     testImplementation(Kotest.runnerJunit5)
-    testImplementation(Ktor2.Test.clientMock)
     testImplementation(Ktor2.Test.serverTestHost)
     testImplementation(Mockk.mockk)
 }
