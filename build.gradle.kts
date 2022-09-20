@@ -30,7 +30,7 @@ dependencies {
     implementation(Ktor2.Server.statusPages)
     implementation(Ktor2.Server.metricsMicrometer)
     implementation(Ktor2.Server.defaultHeaders)
-    implementation("io.ktor:ktor-server-cors:2.1.1")
+    implementation(Ktor2.Server.cors)
 
 
     implementation(Ktor2.Client.core)
