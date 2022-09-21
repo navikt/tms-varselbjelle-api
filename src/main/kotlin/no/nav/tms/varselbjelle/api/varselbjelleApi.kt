@@ -10,13 +10,11 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopping
 import io.ktor.server.application.install
-import io.ktor.server.application.log
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.metrics.micrometer.MicrometerMetrics
-import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.defaultheaders.DefaultHeaders
@@ -61,9 +59,6 @@ fun Application.varselbjelleApi(
 
     }
 
-    install(CallLogging)
-
-    log.info("Application starting with CORS config: $corsAllowedOrigins , $corsAllowedSchemes, $corsAllowedHeaders")
     install(CORS) {
 
         allowCredentials = true
@@ -88,15 +83,13 @@ fun Application.varselbjelleApi(
                     "Token må inneholde fødselsnummer for personen i pid claim"
                 }
 
-                JWTPrincipal(credentials.payload).also {
-                    logger.info("JWT princial created with aud:${it.payload.audience}, sub:${it.payload.subject} and iss: ${it.payload.issuer}")
-                }
+                JWTPrincipal(credentials.payload)
             }
         }
     }
 
     install(ContentNegotiation) {
-        json(jsonConfig())
+        json(jsonConfig(ignoreUnknownKeys = true))
     }
 
     install(MicrometerMetrics) {
