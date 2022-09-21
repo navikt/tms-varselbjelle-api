@@ -16,6 +16,7 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.metrics.micrometer.MicrometerMetrics
+import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.defaultheaders.DefaultHeaders
@@ -46,6 +47,7 @@ fun Application.varselbjelleApi(
 
     install(DefaultHeaders)
 
+
     install(StatusPages) {
         exception<Throwable> { call, cause ->
             when (cause) {
@@ -55,6 +57,8 @@ fun Application.varselbjelleApi(
         }
 
     }
+
+    install(CallLogging)
 
     log.info("Application starting with CORS config: $corsAllowedOrigins , $corsAllowedSchemes, $corsAllowedHeaders")
     install(CORS) {
