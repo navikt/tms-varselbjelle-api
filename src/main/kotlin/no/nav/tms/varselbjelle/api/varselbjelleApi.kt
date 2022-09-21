@@ -52,7 +52,10 @@ fun Application.varselbjelleApi(
         exception<Throwable> { call, cause ->
             when (cause) {
                 is CookieNotSetException -> call.respond(HttpStatusCode.Unauthorized)
-                else -> call.respond(HttpStatusCode.InternalServerError)
+                else -> {
+                    call.respond(HttpStatusCode.InternalServerError)
+                    logger.warn("Feil i varselbjelleApi: $cause, ${cause.message.toString()}")
+                }
             }
         }
 
