@@ -31,6 +31,7 @@ dependencies {
     implementation(Ktor2.Server.metricsMicrometer)
     implementation(Ktor2.Server.defaultHeaders)
     implementation(Ktor2.Server.cors)
+    implementation("com.github.navikt.tms-ktor-token-support:token-support-tokendings-exchange:2.0.0")
 
 
     implementation(Ktor2.Client.core)
