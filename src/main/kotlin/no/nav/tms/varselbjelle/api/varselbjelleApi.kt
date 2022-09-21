@@ -10,6 +10,7 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopping
 import io.ktor.server.application.install
+import io.ktor.server.application.log
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.JWTPrincipal
@@ -24,6 +25,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
+import no.nav.personbruker.dittnav.common.logging.util.logger
 import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.health.healthApi
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
@@ -54,7 +56,9 @@ fun Application.varselbjelleApi(
 
     }
 
+    log.info("Application starting with CORS config: $corsAllowedOrigins , $corsAllowedSchemes, $corsAllowedHeaders")
     install(CORS) {
+
         allowCredentials = true
         allowHost(corsAllowedOrigins, schemes = listOf(corsAllowedSchemes))
         allowHeader(HttpHeaders.ContentType)
@@ -77,7 +81,9 @@ fun Application.varselbjelleApi(
                     "Token må inneholde fødselsnummer for personen i pid claim"
                 }
 
-                JWTPrincipal(credentials.payload)
+                JWTPrincipal(credentials.payload).also {
+                    logger.info("JWT princial created with aud:${it.payload.audience}, sub:${it.payload.subject} and iss: ${it.payload.issuer}")
+                }
             }
         }
     }
