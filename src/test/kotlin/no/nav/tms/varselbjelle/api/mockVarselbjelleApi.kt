@@ -6,13 +6,10 @@ import io.ktor.client.request.cookie
 import io.ktor.client.request.request
 import io.ktor.client.request.url
 import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import io.ktor.server.testing.TestApplicationBuilder
-import io.ktor.server.testing.TestApplicationEngine
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.setBody
+
 import io.mockk.mockk
 import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 

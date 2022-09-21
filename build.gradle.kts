@@ -19,7 +19,6 @@ repositories {
 }
 
 dependencies {
-    implementation(DittNAV.Common.securityAuthenticatedUser)
     implementation(DittNAV.Common.utils)
     implementation(DittNAV.Common.logging)
     implementation(Ktor2.Server.core)
@@ -31,17 +30,14 @@ dependencies {
     implementation(Ktor2.Server.metricsMicrometer)
     implementation(Ktor2.Server.defaultHeaders)
     implementation(Ktor2.Server.cors)
-    implementation("com.github.navikt.tms-ktor-token-support:token-support-tokendings-exchange:2.0.0")
-
+    implementation("com.github.navikt.tms-ktor-token-support:token-support-tokendings-exchange:2022.08.08-14.36-ac5034ce487b")
+    implementation("no.nav.security:token-validation-ktor-v2:2.1.4")
+    implementation("io.github.microutils:kotlin-logging:2.1.23")
 
     implementation(Ktor2.Client.core)
     implementation(Ktor2.Client.apache)
     implementation(Ktor2.Client.contentNegotiation)
     implementation(Ktor2.kotlinX)
-
-
-    implementation("io.github.microutils:kotlin-logging:2.1.23")
-    implementation("com.github.navikt.tms-ktor-token-support:token-support-tokendings-exchange:2022.01.27-13.11-a6b55dd90347")
     implementation(Micrometer.registryPrometheus)
 
     testImplementation(kotlin("test"))
