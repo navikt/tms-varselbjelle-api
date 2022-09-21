@@ -19,7 +19,6 @@ repositories {
 }
 
 dependencies {
-    implementation(DittNAV.Common.securityAuthenticatedUser)
     implementation(DittNAV.Common.utils)
     implementation(DittNAV.Common.logging)
     implementation(Ktor2.Server.core)
@@ -31,7 +30,7 @@ dependencies {
     implementation(Ktor2.Server.metricsMicrometer)
     implementation(Ktor2.Server.defaultHeaders)
     implementation(Ktor2.Server.cors)
-    implementation("com.github.navikt.tms-ktor-token-support:token-support-tokendings-exchange:2.0.0")
+    implementation("com.github.navikt.tms-ktor-token-support:token-support-tokendings-exchange:2022.08.08-14.36-ac5034ce487b")
 
 
     implementation(Ktor2.Client.core)
