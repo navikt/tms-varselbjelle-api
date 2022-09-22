@@ -22,7 +22,7 @@ object HttpClientBuilder {
     fun build(httpClientEngine: HttpClientEngine = Apache.create()): HttpClient {
         return HttpClient(httpClientEngine) {
             install(ContentNegotiation) {
-                json(jsonConfig())
+                json(jsonConfig(ignoreUnknownKeys = true))
             }
             install(HttpTimeout)
         }
