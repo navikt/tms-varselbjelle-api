@@ -20,35 +20,30 @@ repositories {
 
 dependencies {
     implementation(DittNAV.Common.utils)
-    implementation(DittNAV.Common.logging)
+    implementation(Ktor2.Client.core)
+    implementation(Ktor2.Client.apache)
+    implementation(Ktor2.Client.contentNegotiation)
     implementation(Ktor2.Server.core)
     implementation(Ktor2.Server.netty)
-    implementation(Ktor2.Server.authJwt)
     implementation(Ktor2.Server.auth)
     implementation(Ktor2.Server.contentNegotiation)
     implementation(Ktor2.Server.statusPages)
     implementation(Ktor2.Server.metricsMicrometer)
     implementation(Ktor2.Server.defaultHeaders)
     implementation(Ktor2.Server.cors)
-    implementation("com.github.navikt.tms-ktor-token-support:token-support-tokendings-exchange:2022.08.08-14.36-ac5034ce487b")
+    implementation(Ktor2.TmsTokenSupport.tokenXValidation)
+    implementation(Ktor2.TmsTokenSupport.tokendingsExchange)
+    implementation(KotlinLogging.logging)
     implementation("io.ktor:ktor-server-call-logging:2.1.1")
-
-
-
-    implementation(Ktor2.Client.core)
-    implementation(Ktor2.Client.apache)
-    implementation(Ktor2.Client.contentNegotiation)
     implementation(Ktor2.kotlinX)
 
-
-    implementation("io.github.microutils:kotlin-logging:2.1.23")
-    implementation("com.github.navikt.tms-ktor-token-support:token-support-tokendings-exchange:2022.01.27-13.11-a6b55dd90347")
     implementation(Micrometer.registryPrometheus)
 
     testImplementation(kotlin("test"))
     testImplementation(Kotest.assertionsCore)
     testImplementation(Kotest.runnerJunit5)
     testImplementation(Ktor2.Test.serverTestHost)
+    testImplementation(Ktor2.TmsTokenSupport.tokenXValidationMock)
     testImplementation(Mockk.mockk)
 }
 

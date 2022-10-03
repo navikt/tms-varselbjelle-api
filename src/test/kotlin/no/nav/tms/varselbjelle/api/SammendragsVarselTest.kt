@@ -5,6 +5,8 @@ import io.kotest.matchers.shouldBe
 import no.nav.tms.varselbjelle.api.notifikasjon.Notifikasjon
 import org.junit.jupiter.api.Test
 import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
 
 class SammendragsVarselTest {
@@ -19,7 +21,7 @@ class SammendragsVarselTest {
 
     @Test
     fun `konverterer notifikasjon til varselbjelle-varsel med de nødvendige feltene satt`() {
-        val forstbehandlet = ZonedDateTime.of(2019, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
+        val forstbehandlet = ZonedDateTime.now(UTC)
         val varselsideUrl = "www.nav.no/person/dittnav/varslinger"
         val sammendragsVarselDto = SammendragsVarsel(
             notifikasjoner = listOf(Notifikasjon(forstBehandlet = forstbehandlet)),
@@ -39,17 +41,17 @@ class SammendragsVarselTest {
 
     @Test
     fun `konverterer liste av notifikasjoner til varselbjelle-varsel med seneste dato`() {
-        val senesteNotifikasjonstidspunkt = ZonedDateTime.of(2022, 12, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
+        val senesteNotifikasjonstidspunkt = ZonedDateTime.now(UTC)
         val sammendragsVarselDto = SammendragsVarsel(
             listOf(
                 Notifikasjon(
-                    forstBehandlet = ZonedDateTime.of(2022, 2, 2, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
+                    forstBehandlet = senesteNotifikasjonstidspunkt.minusMonths(1)
                 ),
                 Notifikasjon(
                     forstBehandlet = senesteNotifikasjonstidspunkt
                 ),
                 Notifikasjon(
-                    forstBehandlet = ZonedDateTime.of(2022, 3, 3, 1, 1, 1, 1, ZoneId.of("Europe/Oslo"))
+                    forstBehandlet = senesteNotifikasjonstidspunkt.minusMonths(6)
                 )
             ),
             "url"

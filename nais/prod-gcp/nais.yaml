@@ -29,6 +29,10 @@ spec:
     outbound:
       rules:
         - application: dittnav-event-handler
+    inbound:
+      rules:
+        - namespace: personbruker
+          application: innloggingsstatus
   ingresses:
     - "https://person.nav.no/tms-varselbjelle-api"
     - "https://www.nav.no/tms-varselbjelle-api"

@@ -26,6 +26,7 @@ import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
 import no.nav.tms.varselbjelle.api.tokenx.EventhandlerTokendings
 import org.junit.jupiter.api.Test
 import java.time.ZoneId
+import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
 
 class VarselApiTest {
@@ -35,7 +36,7 @@ class VarselApiTest {
 
         val notifikasjoner = listOf(
             Notifikasjon(
-                forstBehandlet = ZonedDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneId.of("Europe/Oslo")),
+                forstBehandlet = ZonedDateTime.now(UTC),
             )
         )
         val eventhandlerTestUrl = "https://test.eventhandler.no"
@@ -64,7 +65,7 @@ class VarselApiTest {
                 httpClient = notifikasjonHttpClient,
                 notifikasjonConsumer = notifikasjonConsumer
             )
-            val response = client.authenticatedGet("tms-varselbjelle-api/rest/varsel/hentsiste")
+            val response = client.get("tms-varselbjelle-api/rest/varsel/hentsiste")
 
             response.status shouldBe HttpStatusCode.OK
             val sammendragsVarselDto = Json.decodeFromString<VarselbjelleResponse>(response.bodyAsText())
@@ -72,15 +73,6 @@ class VarselApiTest {
             sammendragsVarselDto.varsler.nyesteVarsler shouldHaveSize 1
             sammendragsVarselDto.varsler.nyesteVarsler.first().varseltekst shouldBe "Du har 1 varsel"
         }
-    }
-
-    @Test
-    fun `gi 401 ved manglende cookie`() {
-        testApplication {
-            mockVarselbjelleApi()
-            client.get("tms-varselbjelle-api/rest/varsel/hentsiste").status shouldBe HttpStatusCode.Unauthorized
-        }
-
     }
 }
 
