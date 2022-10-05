@@ -19,19 +19,19 @@ import io.ktor.server.routing.routing
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import mu.KotlinLogging
-import no.nav.tms.token.support.tokenx.validation.installTokenXAuth
+import no.nav.tms.token.support.azure.validation.installAzureAuth
 import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.health.healthApi
-import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
+import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
 
 fun Application.varselbjelleApi(
     httpClient: HttpClient,
     corsAllowedOrigins: String,
     corsAllowedSchemes: String,
     corsAllowedHeaders: List<String>,
-    notifikasjonConsumer: NotifikasjonConsumer,
+    notifikasjonConsumer: EventHandlerConsumer,
     varselsideUrl: String,
-    authInstaller: Application.() -> Unit = tokenXInstaller()
+    authInstaller: Application.() -> Unit = azureInstaller()
 ) {
     val collectorRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
@@ -83,8 +83,8 @@ private fun Application.configureShutdownHook(httpClient: HttpClient) {
     }
 }
 
-private fun tokenXInstaller(): Application.() -> Unit = {
-    installTokenXAuth {
+private fun azureInstaller(): Application.() -> Unit = {
+    installAzureAuth {
         setAsDefault = true
     }
 }

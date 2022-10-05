@@ -2,17 +2,11 @@ package no.nav.tms.varselbjelle.api
 
 
 import io.ktor.client.HttpClient
-import io.ktor.client.request.request
-import io.ktor.client.request.url
-import io.ktor.http.ContentType
-import io.ktor.http.HttpMethod
-import io.ktor.http.contentType
 import io.ktor.server.application.*
 import io.ktor.server.testing.TestApplicationBuilder
 import io.mockk.mockk
-import no.nav.tms.token.support.tokenx.validation.mock.SecurityLevel
-import no.nav.tms.token.support.tokenx.validation.mock.installTokenXAuthMock
-import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
+import no.nav.tms.token.support.azure.validation.mock.installAzureAuthMock
+import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
 
 
 fun TestApplicationBuilder.mockVarselbjelleApi(
@@ -20,7 +14,7 @@ fun TestApplicationBuilder.mockVarselbjelleApi(
     corsAllowedOrigins: String = "*.nav.no",
     corsAllowedSchemes: String = "https",
     corsAllowedHeaders: List<String> = listOf(""),
-    notifikasjonConsumer: NotifikasjonConsumer = mockk(relaxed = true),
+    notifikasjonConsumer: EventHandlerConsumer = mockk(relaxed = true),
     varselsideUrl: String = "localhost",
     authMockInstaller: Application.() -> Unit = installMock()
 ) {
@@ -39,18 +33,8 @@ fun TestApplicationBuilder.mockVarselbjelleApi(
 }
 
 private fun installMock(): Application.() -> Unit = {
-    installTokenXAuthMock {
+    installAzureAuthMock {
         setAsDefault = true
         alwaysAuthenticated = true
-        staticUserPid = "123"
-        staticSecurityLevel = SecurityLevel.LEVEL_3
     }
 }
-
-internal suspend fun HttpClient.authenticatedGet(endpoint: String) =
-    request {
-        url(endpoint)
-        method = HttpMethod.Get
-        contentType(ContentType.Application.Json)
-    }
-

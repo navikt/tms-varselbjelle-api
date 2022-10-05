@@ -25,6 +25,9 @@ spec:
     max: 4
   tokenx:
     enabled: true
+  azure:
+    application:
+      enabled: true
   accessPolicy:
     outbound:
       rules:

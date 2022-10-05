@@ -1,6 +1,6 @@
 @file:UseSerializers(ZonedDateTimeSerializer::class)
 
-package no.nav.tms.varselbjelle.api.notifikasjon
+package no.nav.tms.varselbjelle.api.varsel
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -8,6 +8,6 @@ import no.nav.tms.varselbjelle.api.config.ZonedDateTimeSerializer
 import java.time.ZonedDateTime
 
 @Serializable
-data class Notifikasjon(
+data class Varsel(
     val forstBehandlet: ZonedDateTime
 )

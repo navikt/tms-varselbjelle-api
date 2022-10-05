@@ -6,17 +6,18 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
-import no.nav.tms.token.support.tokenx.validation.user.TokenXUserFactory
-import no.nav.tms.varselbjelle.api.notifikasjon.NotifikasjonConsumer
+import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
+import no.nav.tms.varselbjelle.api.user.UserCallValidator.doIfValidRequest
 
-fun Route.varsel(notifikasjonConsumer: NotifikasjonConsumer, varselsideUrl: String) {
+fun Route.varsel(notifikasjonConsumer: EventHandlerConsumer, varselsideUrl: String) {
 
     get("rest/varsel/hentsiste") {
-        val token = call.user.tokenString
-        val notifikasjoner = notifikasjonConsumer.getNotifikasjoner(token)
+        doIfValidRequest { user ->
+            val notifikasjoner = notifikasjonConsumer.getVarsler(user.ident)
 
-        val varselbjelleResponse = VarselbjelleResponse(SammendragsVarsel(notifikasjoner, varselsideUrl).toDto())
-        call.respond(HttpStatusCode.OK, varselbjelleResponse)
+            val sammendragsVarsel = SammendragsVarselDto.fromVarsler(notifikasjoner, varselsideUrl)
+            call.respond(HttpStatusCode.OK, VarselbjelleResponse(sammendragsVarsel))
+        }
     }
 
     post("rest/varsel/erlest/{id}") {
@@ -24,7 +25,3 @@ fun Route.varsel(notifikasjonConsumer: NotifikasjonConsumer, varselsideUrl: Stri
         call.respond(HttpStatusCode.OK)
     }
 }
-
-val ApplicationCall.user get() = TokenXUserFactory.createTokenXUser(this)
-
-
