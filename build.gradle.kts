@@ -34,6 +34,7 @@ dependencies {
     implementation(Ktor2.TmsTokenSupport.azureValidation)
     implementation(Ktor2.TmsTokenSupport.azureExchange)
     implementation(KotlinLogging.logging)
+    implementation(Logstash.logbackEncoder)
     implementation("io.ktor:ktor-server-call-logging:2.1.1")
     implementation(Ktor2.kotlinX)
 

@@ -66,7 +66,7 @@ class VarselApiTest {
                 notifikasjonConsumer = notifikasjonConsumer
             )
             val response = client.request {
-                url("tms-varselbjelle-api/rest/varsel/hentsiste")
+                url("tms-varselbjelle-api/varsel/sammendrag")
                 method = Get
                 header("fodselsnummer", "12345678912")
                 header("auth_level", "4")

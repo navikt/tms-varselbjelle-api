@@ -13,14 +13,14 @@ on:
           - prod-gcp
 
 jobs:
-  setup:
+  prepare-docker-image:
     runs-on: ubuntu-latest
+    outputs:
+      image: ${{ env.IMAGE_FULL_NAME }}
     steps:
 
       - name: 'Sjekk ut koden for dette repo-et'
-        uses: 'actions/checkout@v2'
-        with:
-          FETCH-DEPTH: '0'
+        uses: 'actions/checkout@v3'
 
       - name: 'Utled navn på tag og docker-image basert på siste commit'
         run: |
@@ -28,49 +28,42 @@ jobs:
           TAG_NAME="$(git log -1 --pretty='%ad' --date=format:'%Y%m%d%H%M%S')-$(git log -1 --pretty='%h')"
           IMAGE_BASE="ghcr.io/$GITHUB_REPOSITORY/$APP_NAME"
           echo "IMAGE_FULL_NAME=$IMAGE_BASE:$TAG_NAME" >> $GITHUB_ENV
-          echo "IMAGE_TAG_NAME=$TAG_NAME" >> $GITHUB_ENV
 
       - name: 'Sjekker om docker-image eksisterer fra før av'
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u $GITHUB_REPOSITORY --password-stdin
-          RESULT=$(docker manifest inspect ${{ env.IMAGE_FULL_NAME }} > /dev/null ; echo $?)
+          RESULT=$(docker manifest inspect ${{ env.IMAGE_FULL_NAME }} > /dev/null 2> /dev/null ; echo $?)
           echo "IMAGE_EXISTS=$([[ $RESULT == 0 ]] && echo 'true' || echo 'false' )" >> $GITHUB_ENV
 
-  build-and-push-docker-image:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Setup java
-        uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         if: env.IMAGE_EXISTS == 'false'
         with:
-          java-version: '17.x'
+          distribution: temurin
+          java-version: 17
 
-      - name: Bygg prosjekt
-        uses: navikt/pb-common-gh-actions/build@v2
+      - uses: gradle/gradle-build-action@v2
         if: env.IMAGE_EXISTS == 'false'
         with:
-          SKIP_TESTS: "true"
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          arguments: --configuration-cache build installDist
 
       - name: Bygg, tag og push Docker image
-        uses: navikt/pb-common-gh-actions/docker-publish@v2
         if: env.IMAGE_EXISTS == 'false'
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: ${{ env.TAG_NAME }}
+        run: |
+          docker build --tag ${{ env.IMAGE_FULL_NAME }} .
+          docker push ${{ env.IMAGE_FULL_NAME }}
 
   deploy:
-    needs: build-and-push-docker-image
+    needs: prepare-docker-image
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - name: 'Deploy-er til ${{ inputs.cluster }}'
         uses: 'nais/deploy/actions/deploy@v1'
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: ${{ inputs.cluster }}
           RESOURCE: ./nais/${{ inputs.cluster }}/nais.yaml
-          VAR: version=${{ env.IMAGE }}
+          VAR: version=${{ needs.prepare-docker-image.outputs.image }}
           PRINT_PAYLOAD: true
           REF: ${{ env.CURRENT_REF }}
