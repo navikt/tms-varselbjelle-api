@@ -36,31 +36,33 @@ jobs:
           RESULT=$(docker manifest inspect ${{ env.IMAGE_FULL_NAME }} > /dev/null ; echo $?)
           echo "IMAGE_EXISTS=$([[ $RESULT == 0 ]] && echo 'true' || echo 'false' )" >> $GITHUB_ENV
 
-  build-docker-image:
+  build-and-push-docker-image:
     needs: setup
-    if: env.IMAGE_EXISTS == 'false'
     runs-on: ubuntu-latest
     steps:
 
       - name: Setup java
         uses: actions/setup-java@v1
+        if: env.IMAGE_EXISTS == 'false'
         with:
           java-version: '17.x'
 
       - name: Bygg prosjekt
         uses: navikt/pb-common-gh-actions/build@v2
+        if: env.IMAGE_EXISTS == 'false'
         with:
           SKIP_TESTS: "true"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bygg, tag og push Docker image
         uses: navikt/pb-common-gh-actions/docker-publish@v2
+        if: env.IMAGE_EXISTS == 'false'
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ env.TAG_NAME }}
 
   deploy:
-    needs: build-docker-image
+    needs: build-and-push-docker-image
     runs-on: ubuntu-latest
     steps:
       - name: 'Deploy-er til ${{ inputs.cluster }}'
