@@ -9,10 +9,5 @@ data class Environment(
     val corsAllowedHeaders: List<String> = StringEnvVar.getEnvVarAsList("CORS_ALLOWED_HEADERS"),
     val eventHandlerURL: String = getEnvVar("EVENT_HANDLER_URL"),
     val eventhandlerClientId: String = getEnvVar("EVENTHANDLER_CLIENT_ID"),
-    val varselsideUrl: String = getEnvVar("VARSELSIDE_URL"),
-    val loginserviceIdportenDiscoveryUrl: String = getEnvVar("LOGINSERVICE_IDPORTEN_DISCOVERY_URL"),
-    val jwksUrl: String = getEnvVar("JWKS_URL"),
-    val jwksIssuer: String = getEnvVar("JWKS_ISSUER"),
-    val loginserviceIdportenAudience: String = getEnvVar("LOGINSERVICE_IDPORTEN_AUDIENCE")
-) {
-}
+    val varselsideUrl: String = getEnvVar("VARSELSIDE_URL")
+)

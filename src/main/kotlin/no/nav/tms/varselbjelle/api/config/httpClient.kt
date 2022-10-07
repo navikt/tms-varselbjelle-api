@@ -14,7 +14,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import no.nav.tms.varselbjelle.api.tokenx.AccessToken
+import no.nav.tms.varselbjelle.api.azure.AccessToken
 import java.net.URL
 
 object HttpClientBuilder {
@@ -22,20 +22,18 @@ object HttpClientBuilder {
     fun build(httpClientEngine: HttpClientEngine = Apache.create()): HttpClient {
         return HttpClient(httpClientEngine) {
             install(ContentNegotiation) {
-                json(jsonConfig(ignoreUnknownKeys = true))
+                json(jsonConfig())
             }
             install(HttpTimeout)
         }
     }
-
 }
 
-suspend inline fun <reified T> HttpClient.get(url: URL, accessToken: AccessToken): T = withContext(Dispatchers.IO) {
+suspend inline fun <reified T> HttpClient.getForIdent(url: URL, fnr: String, accessToken: AccessToken): T = withContext(Dispatchers.IO) {
     request {
         url(url)
         method = HttpMethod.Get
+        header("fodselsnummer", fnr)
         header(HttpHeaders.Authorization, "Bearer ${accessToken.value}")
     }
 }.body()
-
-
