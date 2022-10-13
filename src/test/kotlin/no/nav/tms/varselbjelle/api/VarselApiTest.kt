@@ -63,7 +63,7 @@ class VarselApiTest {
 
 
         val response = testApi(varslerFromExternalService = listOf(varsel)) {
-            url("tms-varselbjelle-api/varsel/alle")
+            url("tms-varselbjelle-api/varsel/aktive")
             method = Get
             header("fodselsnummer", "12345678912")
             header("auth_level", "4")
@@ -93,7 +93,7 @@ class VarselApiTest {
         )
 
         val response = testApi(varslerFromExternalService = varsler) {
-            url("tms-varselbjelle-api/varsel/alle")
+            url("tms-varselbjelle-api/varsel/aktive")
             method = Get
             header("fodselsnummer", "12345678912")
             header("auth_level", "4")
@@ -115,7 +115,7 @@ class VarselApiTest {
         )
 
         val response = testApi(varslerFromExternalService = varsler) {
-            url("tms-varselbjelle-api/varsel/alle")
+            url("tms-varselbjelle-api/varsel/aktive")
             method = Get
             header("fodselsnummer", "12345678912")
             header("auth_level", "4")
