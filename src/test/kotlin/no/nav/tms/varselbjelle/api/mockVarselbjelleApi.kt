@@ -6,11 +6,12 @@ import io.ktor.server.application.*
 import io.ktor.server.testing.TestApplicationBuilder
 import io.mockk.mockk
 import no.nav.tms.token.support.azure.validation.mock.installAzureAuthMock
+import no.nav.tms.varselbjelle.api.config.HttpClientBuilder
 import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
 
 
 fun TestApplicationBuilder.mockVarselbjelleApi(
-    httpClient: HttpClient = mockk(relaxed = true),
+    httpClient: HttpClient = HttpClientBuilder.build(),
     corsAllowedOrigins: String = "*.nav.no",
     corsAllowedSchemes: String = "https",
     corsAllowedHeaders: List<String> = listOf(""),

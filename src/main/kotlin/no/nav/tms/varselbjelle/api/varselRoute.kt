@@ -1,14 +1,14 @@
 package no.nav.tms.varselbjelle.api
 
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.*
+import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import mu.KotlinLogging
-import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
 import no.nav.tms.varselbjelle.api.user.UserCallValidator.doIfValidRequest
+import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
 
 fun Route.varsel(notifikasjonConsumer: EventHandlerConsumer, varselsideUrl: String) {
 
@@ -25,6 +25,13 @@ fun Route.varsel(notifikasjonConsumer: EventHandlerConsumer, varselsideUrl: Stri
                 log.error("Uventet feil ved henting av varsel-sammendrag.", e)
                 call.respond(HttpStatusCode.InternalServerError)
             }
+        }
+    }
+
+    get("/varsel/alle") {
+        doIfValidRequest { user ->
+            val varsler = notifikasjonConsumer.getVarsler(user.ident)
+            call.respond(HttpStatusCode.OK, VarselbjelleVarslerByType.fromVarsler(varsler))
         }
     }
 

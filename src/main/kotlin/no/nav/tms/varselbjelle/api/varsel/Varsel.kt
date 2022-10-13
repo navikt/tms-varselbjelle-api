@@ -9,5 +9,15 @@ import java.time.ZonedDateTime
 
 @Serializable
 data class Varsel(
-    val forstBehandlet: ZonedDateTime
+    val forstBehandlet: ZonedDateTime,
+    val type: VarselType,
+    val sikkerhetsnivaa: Int,
+    val tekst: String,
+    val link: String,
 )
+
+enum class VarselType {
+    OPPGAVE,
+    BESKJED,
+    INNBOKS,
+}
