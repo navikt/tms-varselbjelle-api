@@ -3,6 +3,7 @@ package no.nav.tms.varselbjelle.api
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import no.nav.tms.varselbjelle.api.varsel.Varsel
+import no.nav.tms.varselbjelle.api.varsel.VarselType
 import org.junit.jupiter.api.Test
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
@@ -22,7 +23,7 @@ class SammendragsVarselTest {
         val forstbehandlet = ZonedDateTime.now(UTC)
         val varselsideUrl = "www.nav.no/person/dittnav/varslinger"
         val sammendragsVarselDto = SammendragsVarselDto.fromVarsler(
-            varsler = listOf(Varsel(forstBehandlet = forstbehandlet)),
+            varsler = listOf(testVarsel(forstBehandlet = forstbehandlet)),
             varselsideUrl = varselsideUrl
         )
 
@@ -42,13 +43,13 @@ class SammendragsVarselTest {
         val senesteNotifikasjonstidspunkt = ZonedDateTime.now(UTC)
         val sammendragsVarselDto = SammendragsVarselDto.fromVarsler(
             listOf(
-                Varsel(
+                testVarsel(
                     forstBehandlet = senesteNotifikasjonstidspunkt.minusMonths(1)
                 ),
-                Varsel(
+                testVarsel(
                     forstBehandlet = senesteNotifikasjonstidspunkt
                 ),
-                Varsel(
+                testVarsel(
                     forstBehandlet = senesteNotifikasjonstidspunkt.minusMonths(6)
                 )
             ),
@@ -62,4 +63,14 @@ class SammendragsVarselTest {
         varsel.varseltekst shouldBe "Du har 3 varsler"
         varsel.datoOpprettet shouldBe senesteNotifikasjonstidspunkt.toInstant().toEpochMilli().toString()
     }
+
+    private fun testVarsel(forstBehandlet: ZonedDateTime = ZonedDateTime.now(UTC)): Varsel =
+        Varsel(
+            eventId = "123",
+            forstBehandlet = forstBehandlet,
+            type = VarselType.BESKJED,
+            sikkerhetsnivaa = 4,
+            tekst = "",
+            link = ""
+        )
 }
