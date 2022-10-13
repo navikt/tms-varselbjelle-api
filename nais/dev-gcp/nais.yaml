@@ -36,6 +36,8 @@ spec:
       rules:
         - namespace: personbruker
           application: innloggingsstatus
+        - namespace: personbruker
+          application: nav-dekoratoren-api
   ingresses:
     - "https://www.dev.nav.no/tms-varselbjelle-api"
   resources:
