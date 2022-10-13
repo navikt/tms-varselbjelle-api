@@ -24,7 +24,6 @@ import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.varsel.Varsel
 import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
 import no.nav.tms.varselbjelle.api.varsel.VarselType
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
@@ -49,6 +48,35 @@ class VarselApiTest {
             sammendragsVarselDto.varsler.totaltAntallUleste shouldBe 1
             sammendragsVarselDto.varsler.nyesteVarsler shouldHaveSize 1
             sammendragsVarselDto.varsler.nyesteVarsler.first().varseltekst shouldBe "Du har 1 varsel"
+        }
+    }
+
+    @Test
+    fun `Returner varsel med nødvendige felter`() {
+        val varsel = testVarsel(
+            varselType = VarselType.BESKJED,
+            forstbehandlet = ZonedDateTime.now(UTC),
+            sikkerhetsnivaa = 4,
+            tekst = "teekst",
+            link = "liink"
+        )
+
+
+        val response = testApi(varslerFromExternalService = listOf(varsel)) {
+            url("tms-varselbjelle-api/varsel/alle")
+            method = Get
+            header("fodselsnummer", "12345678912")
+            header("auth_level", "4")
+        }
+
+        runBlocking {
+            response.status shouldBe HttpStatusCode.OK
+            val varslerGroupedByType = Json.decodeFromString<VarselbjelleVarslerByType>(response.bodyAsText())
+            val varselResponse = varslerGroupedByType.beskjeder.first()
+            varselResponse.isMasked shouldBe false
+            varselResponse.tidspunkt shouldBe varsel.forstBehandlet
+            varselResponse.link shouldBe varsel.link
+            varselResponse.tekst shouldBe varsel.tekst
         }
     }
 
@@ -80,9 +108,27 @@ class VarselApiTest {
     }
 
     @Test
-    @Disabled
-    fun `masker varsler ved for lavt innlogginsnivå`() {
-        //ismasked - hvis innloggingsnivå er 3 og varsel er 4
+    fun `maskerer varselinnhold ved for lavt innlogginsnivå`() {
+        val varsler = listOf(
+            testVarsel(VarselType.BESKJED, sikkerhetsnivaa = 3),
+        )
+
+        val response = testApi(varslerFromExternalService = varsler) {
+            url("tms-varselbjelle-api/varsel/alle")
+            method = Get
+            header("fodselsnummer", "12345678912")
+            header("auth_level", "4")
+        }
+
+        runBlocking {
+            response.status shouldBe HttpStatusCode.OK
+            val varslerGroupedByType = Json.decodeFromString<VarselbjelleVarslerByType>(response.bodyAsText())
+
+            val varsel = varslerGroupedByType.beskjeder.first()
+            varsel.isMasked shouldBe true
+            varsel.link shouldBe null
+            varsel.tekst shouldBe null
+        }
     }
 
     private fun testApi(
@@ -123,12 +169,18 @@ class VarselApiTest {
         return alleVarslerApiResponse
     }
 
-    private fun testVarsel(varselType: VarselType, sikkerhetsnivaa: Int = 4): Varsel =
+    private fun testVarsel(
+        varselType: VarselType,
+        forstbehandlet: ZonedDateTime = ZonedDateTime.now(UTC),
+        sikkerhetsnivaa: Int = 4,
+        tekst: String = "teekst",
+        link: String = "liink"
+    ): Varsel =
         Varsel(
-            forstBehandlet = ZonedDateTime.now(UTC),
+            forstBehandlet = forstbehandlet,
             type = varselType,
             sikkerhetsnivaa = sikkerhetsnivaa,
-            tekst = "",
-            link = ""
+            tekst = tekst,
+            link = link
         )
 }

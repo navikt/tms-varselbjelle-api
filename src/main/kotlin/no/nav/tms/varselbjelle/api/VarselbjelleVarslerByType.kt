@@ -18,9 +18,17 @@ data class VarselbjelleVarslerByType(
         fun fromVarsler(varsler: List<Varsel>): VarselbjelleVarslerByType {
             val groupedVarsler = varsler.groupBy { it.type }.mapValues {
                 it.value.map { varsel ->
-                    VarselbjelleVarsel(
+                    if(varsel.sikkerhetsnivaa != 4) {
+                        VarselbjelleVarsel(
+                            tidspunkt = varsel.forstBehandlet,
+                            isMasked = true,
+                            tekst = null,
+                            link = null
+                        )
+                    }
+                    else VarselbjelleVarsel(
                         tidspunkt = varsel.forstBehandlet,
-                        isMasked = true,
+                        isMasked = false,
                         tekst = varsel.tekst,
                         link = varsel.link
                     )
@@ -40,6 +48,6 @@ data class VarselbjelleVarslerByType(
 data class VarselbjelleVarsel(
     val tidspunkt: ZonedDateTime,
     val isMasked: Boolean,
-    val tekst: String,
-    val link: String,
+    val tekst: String?,
+    val link: String?,
 )
