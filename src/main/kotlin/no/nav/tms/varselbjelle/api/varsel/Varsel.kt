@@ -9,6 +9,7 @@ import java.time.ZonedDateTime
 
 @Serializable
 data class Varsel(
+    val eventId: String,
     val forstBehandlet: ZonedDateTime,
     val type: VarselType,
     val sikkerhetsnivaa: Int,

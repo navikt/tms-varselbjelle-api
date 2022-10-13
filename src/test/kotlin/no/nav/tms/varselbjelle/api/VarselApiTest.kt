@@ -73,6 +73,7 @@ class VarselApiTest {
             response.status shouldBe HttpStatusCode.OK
             val varslerGroupedByType = Json.decodeFromString<VarselbjelleVarslerByType>(response.bodyAsText())
             val varselResponse = varslerGroupedByType.beskjeder.first()
+            varselResponse.eventId shouldBe varsel.eventId
             varselResponse.isMasked shouldBe false
             varselResponse.tidspunkt shouldBe varsel.forstBehandlet
             varselResponse.link shouldBe varsel.link
@@ -171,12 +172,14 @@ class VarselApiTest {
 
     private fun testVarsel(
         varselType: VarselType,
+        eventId: String = "123",
         forstbehandlet: ZonedDateTime = ZonedDateTime.now(UTC),
         sikkerhetsnivaa: Int = 4,
         tekst: String = "teekst",
         link: String = "liink"
     ): Varsel =
         Varsel(
+            eventId = eventId,
             forstBehandlet = forstbehandlet,
             type = varselType,
             sikkerhetsnivaa = sikkerhetsnivaa,

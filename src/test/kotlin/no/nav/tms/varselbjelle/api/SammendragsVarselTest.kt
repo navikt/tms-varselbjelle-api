@@ -66,6 +66,7 @@ class SammendragsVarselTest {
 
     private fun testVarsel(forstBehandlet: ZonedDateTime = ZonedDateTime.now(UTC)): Varsel =
         Varsel(
+            eventId = "123",
             forstBehandlet = forstBehandlet,
             type = VarselType.BESKJED,
             sikkerhetsnivaa = 4,

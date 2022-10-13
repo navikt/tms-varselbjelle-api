@@ -20,6 +20,7 @@ data class VarselbjelleVarslerByType(
                 it.value.map { varsel ->
                     if(varsel.sikkerhetsnivaa != 4) {
                         VarselbjelleVarsel(
+                            eventId = varsel.eventId,
                             tidspunkt = varsel.forstBehandlet,
                             isMasked = true,
                             tekst = null,
@@ -27,6 +28,7 @@ data class VarselbjelleVarslerByType(
                         )
                     }
                     else VarselbjelleVarsel(
+                        eventId = varsel.eventId,
                         tidspunkt = varsel.forstBehandlet,
                         isMasked = false,
                         tekst = varsel.tekst,
@@ -46,6 +48,7 @@ data class VarselbjelleVarslerByType(
 
 @Serializable
 data class VarselbjelleVarsel(
+    val eventId: String,
     val tidspunkt: ZonedDateTime,
     val isMasked: Boolean,
     val tekst: String?,
