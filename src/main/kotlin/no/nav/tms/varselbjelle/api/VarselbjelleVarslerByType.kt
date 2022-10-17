@@ -15,25 +15,14 @@ data class VarselbjelleVarslerByType(
     val innbokser: List<VarselbjelleVarsel>
     ) {
     companion object {
-        fun fromVarsler(varsler: List<Varsel>): VarselbjelleVarslerByType {
-            val groupedVarsler = varsler.groupBy { it.type }.mapValues {
-                it.value.map { varsel ->
-                    if(varsel.sikkerhetsnivaa != 4) {
-                        VarselbjelleVarsel(
-                            eventId = varsel.eventId,
-                            tidspunkt = varsel.forstBehandlet,
-                            isMasked = true,
-                            tekst = null,
-                            link = null
-                        )
+        fun fromVarsler(varsler: List<Varsel>, authLevel: Int): VarselbjelleVarslerByType {
+            val groupedVarsler = varsler.groupBy { it.type }.mapValues { (_, varsler) ->
+                varsler.map { varsel ->
+                    if(varsel.sikkerhetsnivaa > authLevel) {
+                        varsel.toMaskedVarselbjelleVarsel()
+                    } else {
+                        varsel.toVarselbjelleVarsel()
                     }
-                    else VarselbjelleVarsel(
-                        eventId = varsel.eventId,
-                        tidspunkt = varsel.forstBehandlet,
-                        isMasked = false,
-                        tekst = varsel.tekst,
-                        link = varsel.link
-                    )
                 }
             }
 
@@ -43,6 +32,22 @@ data class VarselbjelleVarslerByType(
                 innbokser = groupedVarsler[VarselType.INNBOKS] ?: emptyList(),
             )
         }
+
+        private fun Varsel.toMaskedVarselbjelleVarsel() = VarselbjelleVarsel(
+            eventId = eventId,
+            tidspunkt = forstBehandlet,
+            isMasked = true,
+            tekst = null,
+            link = null
+        )
+
+        private fun Varsel.toVarselbjelleVarsel() = VarselbjelleVarsel(
+            eventId = eventId,
+            tidspunkt = forstBehandlet,
+            isMasked = false,
+            tekst = tekst,
+            link = link
+        )
     }
 }
 

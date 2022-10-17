@@ -111,14 +111,14 @@ class VarselApiTest {
     @Test
     fun `maskerer varselinnhold ved for lavt innlogginsnivå`() {
         val varsler = listOf(
-            testVarsel(VarselType.BESKJED, sikkerhetsnivaa = 3),
+            testVarsel(VarselType.BESKJED, sikkerhetsnivaa = 4),
         )
 
         val response = testApi(varslerFromExternalService = varsler) {
             url("tms-varselbjelle-api/varsel/aktive")
             method = Get
             header("fodselsnummer", "12345678912")
-            header("auth_level", "4")
+            header("auth_level", "3")
         }
 
         runBlocking {
@@ -175,7 +175,7 @@ class VarselApiTest {
         eventId: String = "123",
         forstbehandlet: ZonedDateTime = ZonedDateTime.now(UTC),
         sikkerhetsnivaa: Int = 4,
-        tekst: String = "teekst",
+        tekst: String = "teekstæøå",
         link: String = "liink"
     ): Varsel =
         Varsel(

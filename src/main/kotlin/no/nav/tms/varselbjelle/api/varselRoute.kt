@@ -31,7 +31,8 @@ fun Route.varsel(notifikasjonConsumer: EventHandlerConsumer, varselsideUrl: Stri
     get("/varsel/aktive") {
         doIfValidRequest { user ->
             val varsler = notifikasjonConsumer.getVarsler(user.ident)
-            call.respond(HttpStatusCode.OK, VarselbjelleVarslerByType.fromVarsler(varsler))
+            val varslerByType = VarselbjelleVarslerByType.fromVarsler(varsler, user.authLevel.toInt())
+            call.respond(HttpStatusCode.OK, varslerByType)
         }
     }
 
