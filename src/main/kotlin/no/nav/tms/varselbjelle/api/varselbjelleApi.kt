@@ -22,14 +22,14 @@ import mu.KotlinLogging
 import no.nav.tms.token.support.azure.validation.installAzureAuth
 import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.health.healthApi
-import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
+import no.nav.tms.varselbjelle.api.varsel.VarselService
 
 fun Application.varselbjelleApi(
     httpClient: HttpClient,
     corsAllowedOrigins: String,
     corsAllowedSchemes: String,
     corsAllowedHeaders: List<String>,
-    notifikasjonConsumer: EventHandlerConsumer,
+    varselService: VarselService,
     varselsideUrl: String,
     authInstaller: Application.() -> Unit = azureInstaller()
 ) {
@@ -69,7 +69,7 @@ fun Application.varselbjelleApi(
             healthApi(collectorRegistry)
 
             authenticate {
-                varsel(notifikasjonConsumer, varselsideUrl)
+                varsel(varselService, varselsideUrl)
             }
         }
     }

@@ -9,27 +9,38 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import io.ktor.http.HttpMethod.Companion.Get
 import io.ktor.serialization.kotlinx.json.json
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.request.header
+import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
+import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.varsel.Varsel
-import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
+import no.nav.tms.varselbjelle.api.varsel.VarselService
 import no.nav.tms.varselbjelle.api.varsel.VarselType
 import org.junit.jupiter.api.Test
+import java.lang.IllegalArgumentException
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
 
+
 class VarselApiTest {
     private val eventhandlerTestUrl = "https://test.eventhandler.no"
+    private val eventaggregatorTestUrl = "https://test.eventaggregator.no"
+    private val acceptedFnr = "54235437876"
 
     @Test
     fun `ende til ende-test av notifikasjon til varselbjelle-varsel`() {
@@ -132,6 +143,47 @@ class VarselApiTest {
         }
     }
 
+    @Test
+    fun `inaktiverer varsel med eventId`() = testApplication {
+        mockVarselbjelleApi(
+            varselService = VarselService(
+                client = eventhandlerHttpClient(),
+                azureTokenFetcher = mockk(relaxed = true),
+                eventHandlerBaseURL = eventhandlerTestUrl,
+                eventAggregatorBaseUrl = eventaggregatorTestUrl
+            )
+        )
+
+        externalServices {
+            hosts(eventaggregatorTestUrl) {
+                routing {
+                    post("varsler/beskjed/done") {
+                        if (call.request.header("fodselsnummer") == acceptedFnr && call.eventId() == "doneeventid") {
+                            call.respond(HttpStatusCode.OK)
+                        } else {
+                            call.respond(HttpStatusCode.BadRequest)
+                        }
+                    }
+                }
+            }
+        }
+
+        client.post {
+            url("tms-varselbjelle-api/varsel/beskjed/done")
+            header("fodselsnummer", acceptedFnr)
+            //TODO: bør en ha en sjekk på innloggingsnivå her?
+            header("auth_level", "4")
+            setBody("""{ "eventId": "doneeventid"}""".trimMargin())
+        }.status shouldBe HttpStatusCode.OK
+    }
+
+    private fun ApplicationTestBuilder.eventhandlerHttpClient() = createClient {
+        install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
+            json(jsonConfig())
+        }
+        install(HttpTimeout)
+    }
+
     private fun testApi(
         varslerFromExternalService: List<Varsel>,
         clientBuilder: HttpRequestBuilder.() -> Unit
@@ -149,20 +201,15 @@ class VarselApiTest {
                 }
             }
 
-            val eventHandlerHttpClient = createClient {
-                install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
-                    json(jsonConfig())
-                }
-                install(HttpTimeout)
-            }
-            val notifikasjonConsumer = EventHandlerConsumer(
-                client = eventHandlerHttpClient,
-                eventhandlerTokendings = mockk(relaxed = true),
-                eventHandlerBaseURL = eventhandlerTestUrl
+            val varselService = VarselService(
+                client = eventhandlerHttpClient(),
+                azureTokenFetcher = mockk(relaxed = true),
+                eventHandlerBaseURL = eventhandlerTestUrl,
+                eventAggregatorBaseUrl = eventaggregatorTestUrl
             )
 
             mockVarselbjelleApi(
-                notifikasjonConsumer = notifikasjonConsumer
+                varselService = varselService
             )
 
             alleVarslerApiResponse = client.request { clientBuilder() }
@@ -187,3 +234,9 @@ class VarselApiTest {
             link = link
         )
 }
+
+private suspend fun ApplicationCall.eventId(): String =
+    receive<String>().let {
+        Json.parseToJsonElement(it).jsonObject["eventId"]?.jsonPrimitive?.content
+            ?: throw IllegalArgumentException("eventId finnes ikke i body")
+    }
