@@ -16,7 +16,7 @@ fun main() {
         AzureTokenFetcher(
             tokendingsService = tokendingsService,
             eventhandlerClientId = environment.eventhandlerClientId,
-            eventaggregatorClientId = environment.eventhandlerClientId
+            eventaggregatorClientId = environment.eventaggregatorClientId
         )
 
     val httpClient = HttpClientBuilder.build()
@@ -25,7 +25,7 @@ fun main() {
             client = httpClient,
             azureTokenFetcher = eventhandlerTokendings,
             eventHandlerBaseURL = environment.eventHandlerURL,
-            eventAggregatorBaseUrl = environment.eventHandlerURL
+            eventAggregatorBaseUrl = environment.eventAggregatorURL
         )
 
     embeddedServer(Netty, port = 8080) {
