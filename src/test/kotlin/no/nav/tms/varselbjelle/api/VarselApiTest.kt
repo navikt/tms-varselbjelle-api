@@ -150,12 +150,12 @@ class VarselApiTest {
                 client = eventhandlerHttpClient(),
                 azureTokenFetcher = mockk(relaxed = true),
                 eventHandlerBaseURL = eventhandlerTestUrl,
-                eventAggregatorBaseUrl = eventaggregatorTestUrl
+                eventAggregatorBaseUrl = eventhandlerTestUrl
             )
         )
 
-        externalServices {
-            hosts(eventaggregatorTestUrl) {
+         externalServices {
+            hosts(eventhandlerTestUrl) {
                 routing {
                     post("varsler/beskjed/done") {
                         if (call.request.header("fodselsnummer") == acceptedFnr && call.eventId() == "doneeventid") {
@@ -205,7 +205,7 @@ class VarselApiTest {
                 client = eventhandlerHttpClient(),
                 azureTokenFetcher = mockk(relaxed = true),
                 eventHandlerBaseURL = eventhandlerTestUrl,
-                eventAggregatorBaseUrl = eventaggregatorTestUrl
+                eventAggregatorBaseUrl = eventhandlerTestUrl
             )
 
             mockVarselbjelleApi(
