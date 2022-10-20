@@ -42,8 +42,17 @@ fun Application.varselbjelleApi(
     install(StatusPages) {
         val logger = KotlinLogging.logger {}
         exception<Throwable> { call, cause ->
-                call.respond(HttpStatusCode.InternalServerError)
-                logger.warn("Feil i varselbjelleApi: $cause, ${cause.message.toString()}")
+            when(cause){
+                is IllegalArgumentException -> {
+                    call.respond(HttpStatusCode.BadRequest, cause.message?:"")
+                    logger.info("Bad request til varselbjelleApi: $cause, ${cause.message.toString()}")
+
+                }
+                else -> {
+                    call.respond(HttpStatusCode.InternalServerError)
+                    logger.error("Feil i varselbjelleApi: $cause, ${cause.message.toString()}")
+                }
+            }
         }
     }
 

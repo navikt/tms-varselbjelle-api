@@ -56,6 +56,9 @@ fun Route.varsel(varselService: VarselService, varselsideUrl: String) {
 }
 
 private suspend fun ApplicationCall.eventId(): String = receive<String>().let {
+    if (it.isEmpty()){
+        throw IllegalArgumentException("request mangler body innhold")
+    }
     Json.parseToJsonElement(it).jsonObject["eventId"]?.jsonPrimitive?.content
         ?: throw IllegalArgumentException("eventId finnes ikke i body")
 }

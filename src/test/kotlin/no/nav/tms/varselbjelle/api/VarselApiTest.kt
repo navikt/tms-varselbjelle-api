@@ -31,6 +31,7 @@ import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.varsel.Varsel
 import no.nav.tms.varselbjelle.api.varsel.VarselService
 import no.nav.tms.varselbjelle.api.varsel.VarselType
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.lang.IllegalArgumentException
 import java.time.ZoneOffset.UTC
@@ -143,39 +144,66 @@ class VarselApiTest {
         }
     }
 
-    @Test
-    fun `inaktiverer varsel med eventId`() = testApplication {
-        mockVarselbjelleApi(
-            varselService = VarselService(
-                client = eventhandlerHttpClient(),
-                azureTokenFetcher = mockk(relaxed = true),
-                eventHandlerBaseURL = eventhandlerTestUrl,
-                eventAggregatorBaseUrl = eventaggregatorTestUrl
-            )
-        )
+    @Nested
+    inner class DoneEndpoint {
+        @Test
+        fun `inaktiverer varsel med eventId`() = testApplication {
+            mockDoneApi()
 
-        externalServices {
-            hosts(eventaggregatorTestUrl) {
-                routing {
-                    post("varsler/beskjed/done") {
-                        if (call.request.header("fodselsnummer") == acceptedFnr && call.eventId() == "doneeventid") {
-                            call.respond(HttpStatusCode.OK)
-                        } else {
-                            call.respond(HttpStatusCode.BadRequest)
+            client.post {
+                url("tms-varselbjelle-api/varsel/beskjed/done")
+                header("fodselsnummer", acceptedFnr)
+                header("auth_level", "4")
+                setBody("""{ "eventId": "doneeventid"}""".trimMargin())
+            }.status shouldBe HttpStatusCode.OK
+        }
+
+        @Test
+        fun `400 hvis eventid mangler eller body er tom`() = testApplication {
+            mockDoneApi()
+            client.post {
+                url("tms-varselbjelle-api/varsel/beskjed/done")
+                header("fodselsnummer", acceptedFnr)
+                header("auth_level", "4")
+            }.status shouldBe HttpStatusCode.BadRequest
+
+            client.post {
+                url("tms-varselbjelle-api/varsel/beskjed/done")
+                header("fodselsnummer", acceptedFnr)
+                header("auth_level", "4")
+                setBody("""{ "ikkeEventId": "ikkeDoneEventid"}""".trimMargin())
+            }.status shouldBe HttpStatusCode.BadRequest
+
+        }
+
+
+        private fun ApplicationTestBuilder.mockDoneApi() {
+            mockVarselbjelleApi(
+                varselService = VarselService(
+                    client = eventhandlerHttpClient(),
+                    azureTokenFetcher = mockk(relaxed = true),
+                    eventHandlerBaseURL = eventhandlerTestUrl,
+                    eventAggregatorBaseUrl = eventaggregatorTestUrl
+                )
+            )
+
+            externalServices {
+                hosts(eventaggregatorTestUrl) {
+                    routing {
+                        post("varsler/beskjed/done") {
+                            if (call.request.header("fodselsnummer") == acceptedFnr && call.eventId() == "doneeventid") {
+                                call.respond(HttpStatusCode.OK)
+                            } else {
+                                call.respond(HttpStatusCode.BadRequest)
+                            }
                         }
                     }
                 }
             }
-        }
 
-        client.post {
-            url("tms-varselbjelle-api/varsel/beskjed/done")
-            header("fodselsnummer", acceptedFnr)
-            //TODO: bør en ha en sjekk på innloggingsnivå her?
-            header("auth_level", "4")
-            setBody("""{ "eventId": "doneeventid"}""".trimMargin())
-        }.status shouldBe HttpStatusCode.OK
+        }
     }
+
 
     private fun ApplicationTestBuilder.eventhandlerHttpClient() = createClient {
         install(io.ktor.client.plugins.contentnegotiation.ContentNegotiation) {
