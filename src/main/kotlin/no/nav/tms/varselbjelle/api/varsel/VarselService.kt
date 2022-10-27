@@ -12,6 +12,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mu.KLogger
+import mu.KotlinLogging
 import no.nav.tms.varselbjelle.api.config.getForIdent
 import no.nav.tms.varselbjelle.api.azure.AzureTokenFetcher
 import java.lang.Exception
@@ -23,6 +25,8 @@ class VarselService(
     eventHandlerBaseURL: String,
     eventAggregatorBaseUrl: String
 ) {
+    val log = KotlinLogging.logger {}
+
     private val varselEndpoint = URL("$eventHandlerBaseURL/fetch/varsel/on-behalf-of/aktive")
     private val doneEndpoint = URL("$eventAggregatorBaseUrl/on-behalf-of/beskjed/done")
 
@@ -33,6 +37,7 @@ class VarselService(
 
     suspend fun postBeskjedDone(eventId: String, fnr: String) {
         val accessToken = azureTokenFetcher.fetchEventAggregatorToken()
+        log.info("Sender done til eventaggreagtor for eventid $eventId")
         withContext(Dispatchers.IO) {
             client.request {
                 url(doneEndpoint)
@@ -43,6 +48,7 @@ class VarselService(
                 setBody("""{"eventId": "$eventId"}""")
             }
         }.apply {
+            log.info("Mottok respons fra event-aggragtaor: $status for eventid $eventId")
             if (status != HttpStatusCode.OK)
                 throw DoneFailedException(eventId, status)
         }
