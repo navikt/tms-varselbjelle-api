@@ -7,10 +7,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
 import io.ktor.server.response.respond
 import io.ktor.server.routing.post
-import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.server.testing.ApplicationTestBuilder
-import io.ktor.server.testing.TestApplicationBuilder
 import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -22,7 +20,7 @@ import org.junit.jupiter.api.Test
 
 class VarselServiceTest {
     private val aggreagtorTestHost = "https://aggregator.test"
-    private val doneEndpoint = "beskjed/done"
+    private val doneEndpoint = "on-behalf-of/beskjed/done"
     private val testEventId = "12345678kj"
     private val testFnr = "123456678910"
 

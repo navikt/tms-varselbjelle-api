@@ -24,7 +24,7 @@ class VarselService(
     eventAggregatorBaseUrl: String
 ) {
     private val varselEndpoint = URL("$eventHandlerBaseURL/fetch/varsel/on-behalf-of/aktive")
-    private val doneEndpoint = URL("$eventAggregatorBaseUrl/beskjed/done")
+    private val doneEndpoint = URL("$eventAggregatorBaseUrl/on-behalf-of/beskjed/done")
 
     suspend fun getVarsler(ident: String): List<Varsel> {
         val accessToken = azureTokenFetcher.fetchEventhandlerToken()

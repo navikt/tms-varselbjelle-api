@@ -196,7 +196,7 @@ class VarselApiTest {
             externalServices {
                 hosts(eventaggregatorTestUrl) {
                     routing {
-                        post("beskjed/done") {
+                        post("on-behalf-of/beskjed/done") {
                             when {
                                 call.request.header("fodselsnummer") == acceptedFnr && call.eventId() == "doneeventid" ->
                                     call.respond(respondWith)
