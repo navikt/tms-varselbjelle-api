@@ -2,6 +2,7 @@ package no.nav.tms.varselbjelle.api
 
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
+import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.request.*
 import io.ktor.client.statement.HttpResponse
@@ -146,38 +147,43 @@ class VarselApiTest {
 
     @Nested
     inner class DoneEndpoint {
+
+        private val defaultBody="""{ "eventId": "doneeventid"}""".trimMargin()
         @Test
         fun `inaktiverer varsel med eventId`() = testApplication {
-            mockDoneApi()
-
-            client.post {
-                url("tms-varselbjelle-api/varsel/beskjed/done")
-                header("fodselsnummer", acceptedFnr)
-                header("auth_level", "4")
-                setBody("""{ "eventId": "doneeventid"}""".trimMargin())
-            }.status shouldBe HttpStatusCode.OK
+            mockDoneApi(HttpStatusCode.OK)
+            client.postDone(body = defaultBody).status shouldBe HttpStatusCode.OK
         }
 
         @Test
         fun `400 hvis eventid mangler eller body er tom`() = testApplication {
-            mockDoneApi()
-            client.post {
-                url("tms-varselbjelle-api/varsel/beskjed/done")
-                header("fodselsnummer", acceptedFnr)
-                header("auth_level", "4")
-            }.status shouldBe HttpStatusCode.BadRequest
+            mockDoneApi(HttpStatusCode.OK)
+            client.postDone(body = null).status shouldBe HttpStatusCode.BadRequest
+            client.postDone(body = """{ "ikkeEventId": "ikkeDoneEventid"}""".trimMargin()).status shouldBe HttpStatusCode.BadRequest
+        }
 
-            client.post {
-                url("tms-varselbjelle-api/varsel/beskjed/done")
-                header("fodselsnummer", acceptedFnr)
-                header("auth_level", "4")
-                setBody("""{ "ikkeEventId": "ikkeDoneEventid"}""".trimMargin())
-            }.status shouldBe HttpStatusCode.BadRequest
+        @Test
+        fun `Feilkoder hvis varselbjelleapi feiler mot eventaggragator`() {
+            testApplication {
+                mockDoneApi(HttpStatusCode.MethodNotAllowed)
+                client.postDone(defaultBody).status shouldBe HttpStatusCode.InternalServerError
+            }
+            testApplication {
+                mockDoneApi(HttpStatusCode.NotFound)
+                client.postDone(defaultBody).status shouldBe HttpStatusCode.NotFound
+            }
 
         }
 
+        private suspend fun HttpClient.postDone(body: String?) = post {
+            url("tms-varselbjelle-api/varsel/beskjed/done")
+            header("fodselsnummer", acceptedFnr)
+            header("auth_level", "4")
+            if (body != null)
+                setBody(body)
+        }
 
-        private fun ApplicationTestBuilder.mockDoneApi() {
+        private fun ApplicationTestBuilder.mockDoneApi(respondWith: HttpStatusCode) {
             mockVarselbjelleApi(
                 varselService = VarselService(
                     client = eventhandlerHttpClient(),
@@ -190,11 +196,12 @@ class VarselApiTest {
             externalServices {
                 hosts(eventaggregatorTestUrl) {
                     routing {
-                        post("varsler/beskjed/done") {
-                            if (call.request.header("fodselsnummer") == acceptedFnr && call.eventId() == "doneeventid") {
-                                call.respond(HttpStatusCode.OK)
-                            } else {
-                                call.respond(HttpStatusCode.BadRequest)
+                        post("beskjed/done") {
+                            when {
+                                call.request.header("fodselsnummer") == acceptedFnr && call.eventId() == "doneeventid" ->
+                                    call.respond(respondWith)
+
+                                else -> call.respond(HttpStatusCode.BadRequest)
                             }
                         }
                     }
@@ -262,6 +269,7 @@ class VarselApiTest {
             link = link
         )
 }
+
 
 private suspend fun ApplicationCall.eventId(): String =
     receive<String>().let {
