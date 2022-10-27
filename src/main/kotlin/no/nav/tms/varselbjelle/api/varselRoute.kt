@@ -49,7 +49,9 @@ fun Route.varsel(varselService: VarselService, varselsideUrl: String) {
 
     post("/varsel/beskjed/done") {
         doIfValidRequest { user ->
-            varselService.postBeskjedDone(eventId = call.eventId(), fnr = user.ident)
+            val eventId = call.eventId()
+            log.info("Mottok done kall $eventId")
+            varselService.postBeskjedDone(eventId = eventId, fnr = user.ident)
             call.respond(HttpStatusCode.OK)
         }
     }
