@@ -43,7 +43,7 @@ class VarselService(
                 url(doneEndpoint)
                 method = HttpMethod.Post
                 header("fodselsnummer", fnr)
-                header(HttpHeaders.Authorization, "Bearer $accessToken")
+                header(HttpHeaders.Authorization, "Bearer ${accessToken.value}")
                 header(HttpHeaders.ContentType, ContentType.Application.Json)
                 setBody("""{"eventId": "$eventId"}""")
             }
