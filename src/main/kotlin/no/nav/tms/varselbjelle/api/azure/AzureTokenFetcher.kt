@@ -14,4 +14,5 @@ class AzureTokenFetcher(
     suspend fun fetchEventAggregatorToken(): AccessToken =
         AccessToken(tokendingsService.getAccessToken(eventaggregatorClientId))
 
+    suspend fun rawEventAggregatorToken() = tokendingsService.getAccessToken(eventaggregatorClientId)
 }

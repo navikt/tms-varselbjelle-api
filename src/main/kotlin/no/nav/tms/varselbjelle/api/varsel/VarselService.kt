@@ -54,7 +54,7 @@ class VarselService(
         }
     }
 
-    suspend fun getToken() = azureTokenFetcher.fetchEventAggregatorToken()
+    suspend fun getToken() = azureTokenFetcher.rawEventAggregatorToken()
 }
 
 class DoneFailedException(val eventId: String, val statusCode: HttpStatusCode) : Exception() {
