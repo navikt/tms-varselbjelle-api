@@ -13,7 +13,6 @@ import io.ktor.server.testing.testApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import no.nav.tms.varselbjelle.api.azure.AccessToken
 import no.nav.tms.varselbjelle.api.azure.AzureTokenFetcher
 import no.nav.tms.varselbjelle.api.config.jsonConfig
 import org.junit.jupiter.api.Test
@@ -66,7 +65,7 @@ class VarselServiceTest {
     private fun ApplicationTestBuilder.varselService() = VarselService(
         client = createClient { jsonConfig() },
         azureTokenFetcher = mockk<AzureTokenFetcher>().also {
-            coEvery { it.fetchEventAggregatorToken() } returns AccessToken("tadda")
+            coEvery { it.fetchEventAggregatorToken() } returns "tadda"
         },
         eventHandlerBaseURL = "https://tadda.test",
         eventAggregatorBaseUrl = aggreagtorTestHost

@@ -7,11 +7,7 @@ class AzureTokenFetcher(
     private val eventhandlerClientId: String,
     private val eventaggregatorClientId: String
 ) {
-    suspend fun fetchEventhandlerToken(): AccessToken {
-        return AccessToken(tokendingsService.getAccessToken(eventhandlerClientId))
-    }
-
-    suspend fun fetchEventAggregatorToken(): AccessToken =
-        AccessToken(tokendingsService.getAccessToken(eventaggregatorClientId))
+    suspend fun fetchEventhandlerToken() = tokendingsService.getAccessToken(eventhandlerClientId)
+    suspend fun fetchEventAggregatorToken() = tokendingsService.getAccessToken(eventaggregatorClientId)
 
 }
