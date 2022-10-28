@@ -6,7 +6,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationStopping
-import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.metrics.micrometer.MicrometerMetrics
@@ -15,12 +14,10 @@ import io.ktor.server.plugins.cors.routing.CORS
 import io.ktor.server.plugins.defaultheaders.DefaultHeaders
 import io.ktor.server.plugins.statuspages.StatusPages
 import io.ktor.server.response.respond
-import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.tms.token.support.azure.validation.installAzureAuth
 import no.nav.tms.varselbjelle.api.config.jsonConfig
@@ -35,7 +32,7 @@ fun Application.varselbjelleApi(
     corsAllowedHeaders: List<String>,
     varselService: VarselService,
     varselsideUrl: String,
-    authInstaller: Application.() -> Unit = azureInstaller(),
+    authInstaller: Application.() -> Unit = azureInstaller()
 ) {
     val collectorRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
 
@@ -85,12 +82,9 @@ fun Application.varselbjelleApi(
     routing {
         route("/tms-varselbjelle-api") {
             healthApi(collectorRegistry)
+
             authenticate {
                 varsel(varselService, varselsideUrl)
-            }
-
-            get("/test"){
-                call.respond(varselService.getToken())
             }
         }
     }
