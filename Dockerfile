@@ -9,8 +9,7 @@ RUN $JAVA_HOME/bin/jlink \
          --compress=2 \
          --output /javaruntime
 
-RUN apt-get update && apt-get install -y \
-curl
+RUN apt-get update && apt-get install curl
 # Runtime
 FROM debian:buster-slim
 ENV TZ="Europe/Oslo"
