@@ -22,14 +22,15 @@ import mu.KotlinLogging
 import no.nav.tms.token.support.azure.validation.installAzureAuth
 import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.health.healthApi
-import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
+import no.nav.tms.varselbjelle.api.varsel.DoneFailedException
+import no.nav.tms.varselbjelle.api.varsel.VarselService
 
 fun Application.varselbjelleApi(
     httpClient: HttpClient,
     corsAllowedOrigins: String,
     corsAllowedSchemes: String,
     corsAllowedHeaders: List<String>,
-    notifikasjonConsumer: EventHandlerConsumer,
+    varselService: VarselService,
     varselsideUrl: String,
     authInstaller: Application.() -> Unit = azureInstaller()
 ) {
@@ -42,8 +43,22 @@ fun Application.varselbjelleApi(
     install(StatusPages) {
         val logger = KotlinLogging.logger {}
         exception<Throwable> { call, cause ->
-                call.respond(HttpStatusCode.InternalServerError)
-                logger.warn("Feil i varselbjelleApi: $cause, ${cause.message.toString()}")
+            when (cause) {
+                is IllegalArgumentException -> {
+                    logger.info("Bad request til varselbjelleApi: $cause, ${cause.message.toString()}")
+                    call.respond(HttpStatusCode.BadRequest, cause.message ?: "")
+                }
+
+                is DoneFailedException -> {
+                    logger.info("Done kall feilet mot event-aggragtaor med statuskode ${cause.statusCode} for eventId: ${cause.eventId}")
+                    call.respond(cause.resolveHttpResponse())
+                }
+
+                else -> {
+                    call.respond(HttpStatusCode.InternalServerError)
+                    logger.error("Feil i varselbjelleApi: $cause, ${cause.message.toString()}")
+                }
+            }
         }
     }
 
@@ -69,7 +84,7 @@ fun Application.varselbjelleApi(
             healthApi(collectorRegistry)
 
             authenticate {
-                varsel(notifikasjonConsumer, varselsideUrl)
+                varsel(varselService, varselsideUrl)
             }
         }
     }

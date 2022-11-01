@@ -7,7 +7,7 @@ import io.ktor.server.testing.TestApplicationBuilder
 import io.mockk.mockk
 import no.nav.tms.token.support.azure.validation.mock.installAzureAuthMock
 import no.nav.tms.varselbjelle.api.config.HttpClientBuilder
-import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
+import no.nav.tms.varselbjelle.api.varsel.VarselService
 
 
 fun TestApplicationBuilder.mockVarselbjelleApi(
@@ -15,7 +15,7 @@ fun TestApplicationBuilder.mockVarselbjelleApi(
     corsAllowedOrigins: String = "*.nav.no",
     corsAllowedSchemes: String = "https",
     corsAllowedHeaders: List<String> = listOf(""),
-    notifikasjonConsumer: EventHandlerConsumer = mockk(relaxed = true),
+    varselService: VarselService = mockk(relaxed = true),
     varselsideUrl: String = "localhost",
     authMockInstaller: Application.() -> Unit = installMock()
 ) {
@@ -26,7 +26,7 @@ fun TestApplicationBuilder.mockVarselbjelleApi(
             corsAllowedOrigins = corsAllowedOrigins,
             corsAllowedSchemes = corsAllowedSchemes,
             corsAllowedHeaders = corsAllowedHeaders,
-            notifikasjonConsumer = notifikasjonConsumer,
+            varselService = varselService,
             varselsideUrl = varselsideUrl,
             authInstaller = authMockInstaller
         )

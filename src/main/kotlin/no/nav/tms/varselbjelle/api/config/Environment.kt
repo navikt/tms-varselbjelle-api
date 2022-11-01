@@ -8,6 +8,8 @@ data class Environment(
     val corsAllowedSchemes: String = getEnvVar("CORS_ALLOWED_SCHEMES","https"),
     val corsAllowedHeaders: List<String> = StringEnvVar.getEnvVarAsList("CORS_ALLOWED_HEADERS"),
     val eventHandlerURL: String = getEnvVar("EVENT_HANDLER_URL"),
+    val eventAggregatorURL: String = getEnvVar("EVENT_AGGREGATOR_URL"),
     val eventhandlerClientId: String = getEnvVar("EVENTHANDLER_CLIENT_ID"),
+    val eventaggregatorClientId: String = getEnvVar("EVENTAGGREGATOR_CLIENT_ID"),
     val varselsideUrl: String = getEnvVar("VARSELSIDE_URL")
 )

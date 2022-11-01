@@ -5,17 +5,28 @@ import io.ktor.server.netty.Netty
 import no.nav.tms.token.support.azure.exchange.AzureServiceBuilder
 import no.nav.tms.varselbjelle.api.config.Environment
 import no.nav.tms.varselbjelle.api.config.HttpClientBuilder
-import no.nav.tms.varselbjelle.api.varsel.EventHandlerConsumer
-import no.nav.tms.varselbjelle.api.azure.EventhandlerTokenFetcher
+import no.nav.tms.varselbjelle.api.varsel.VarselService
+import no.nav.tms.varselbjelle.api.azure.AzureTokenFetcher
 
 fun main() {
     val environment = Environment()
 
     val tokendingsService = AzureServiceBuilder.buildAzureService()
-    val eventhandlerTokendings = EventhandlerTokenFetcher(tokendingsService, environment.eventhandlerClientId)
+    val eventhandlerTokendings =
+        AzureTokenFetcher(
+            tokendingsService = tokendingsService,
+            eventhandlerClientId = environment.eventhandlerClientId,
+            eventaggregatorClientId = environment.eventaggregatorClientId
+        )
 
     val httpClient = HttpClientBuilder.build()
-    val notifikasjonConsumer = EventHandlerConsumer(httpClient, eventhandlerTokendings, environment.eventHandlerURL)
+    val varselService =
+        VarselService(
+            client = httpClient,
+            azureTokenFetcher = eventhandlerTokendings,
+            eventHandlerBaseURL = environment.eventHandlerURL,
+            eventAggregatorBaseUrl = environment.eventAggregatorURL
+        )
 
     embeddedServer(Netty, port = 8080) {
         varselbjelleApi(
@@ -23,7 +34,7 @@ fun main() {
             corsAllowedOrigins = environment.corsAllowedOrigins,
             corsAllowedSchemes = environment.corsAllowedSchemes,
             corsAllowedHeaders = environment.corsAllowedHeaders,
-            notifikasjonConsumer = notifikasjonConsumer,
+            varselService = varselService,
             varselsideUrl = environment.varselsideUrl
         )
     }.start(wait = true)
