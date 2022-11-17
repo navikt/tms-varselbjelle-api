@@ -20,6 +20,14 @@ fun Route.varsel(varselService: VarselService, varselsideUrl: String) {
 
     val log = KotlinLogging.logger {}
 
+    get("/varsel") {
+        doIfValidRequest { user ->
+            val varsler = varselService.getVarsler(user.ident)
+            val varslerByType = VarselbjelleVarsler.fromVarsler(varsler, user.authLevel.toInt())
+            call.respond(HttpStatusCode.OK, varslerByType)
+        }
+    }
+
     get("/varsel/sammendrag") {
         doIfValidRequest { user ->
             try {
@@ -56,7 +64,7 @@ fun Route.varsel(varselService: VarselService, varselsideUrl: String) {
 }
 
 private suspend fun ApplicationCall.eventId(): String = receive<String>().let {
-    if (it.isEmpty()){
+    if (it.isEmpty()) {
         throw IllegalArgumentException("request mangler body innhold")
     }
     Json.parseToJsonElement(it).jsonObject["eventId"]?.jsonPrimitive?.content
