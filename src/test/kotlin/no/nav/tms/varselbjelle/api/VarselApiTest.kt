@@ -32,6 +32,9 @@ import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.varsel.Varsel
 import no.nav.tms.varselbjelle.api.varsel.VarselService
 import no.nav.tms.varselbjelle.api.varsel.VarselType
+import no.nav.tms.varselbjelle.api.varsel.VarselType.BESKJED
+import no.nav.tms.varselbjelle.api.varsel.VarselType.INNBOKS
+import no.nav.tms.varselbjelle.api.varsel.VarselType.OPPGAVE
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.lang.IllegalArgumentException
@@ -46,7 +49,7 @@ class VarselApiTest {
 
     @Test
     fun `ende til ende-test av notifikasjon til varselbjelle-varsel`() {
-        val varsler = listOf(testVarsel(VarselType.BESKJED))
+        val varsler = listOf(testVarsel(BESKJED))
 
         val response = testApi(varslerFromExternalService = varsler) {
             url("tms-varselbjelle-api/varsel/sammendrag")
@@ -54,7 +57,6 @@ class VarselApiTest {
             header("fodselsnummer", "12345678912")
             header("auth_level", "4")
         }
-
         runBlocking {
             response.status shouldBe HttpStatusCode.OK
             val sammendragsVarselDto = Json.decodeFromString<VarselbjelleResponse>(response.bodyAsText())
@@ -67,7 +69,7 @@ class VarselApiTest {
     @Test
     fun `Returner varsel med nødvendige felter`() {
         val varsel = testVarsel(
-            varselType = VarselType.BESKJED,
+            varselType = BESKJED,
             forstbehandlet = ZonedDateTime.now(UTC),
             sikkerhetsnivaa = 4,
             tekst = "teekst",
@@ -97,9 +99,9 @@ class VarselApiTest {
     @Test
     fun `Returner liste av varsler`() {
         val varsler = listOf(
-            testVarsel(VarselType.BESKJED),
-            testVarsel(VarselType.OPPGAVE),
-            testVarsel(VarselType.OPPGAVE),
+            testVarsel(BESKJED),
+            testVarsel(OPPGAVE),
+            testVarsel(OPPGAVE),
             testVarsel(VarselType.INNBOKS),
             testVarsel(VarselType.INNBOKS),
             testVarsel(VarselType.INNBOKS),
@@ -122,33 +124,82 @@ class VarselApiTest {
     }
 
     @Test
-    fun `maskerer varselinnhold ved for lavt innlogginsnivå`() {
-        val varsler = listOf(
-            testVarsel(VarselType.BESKJED, sikkerhetsnivaa = 4),
-        )
+    fun `Returner liste av varsler med innboks og beskjed i samme liste`() {
+        val varsler =
+            testVarsel(BESKJED) * 3 + testVarsel(OPPGAVE) * 2 + testVarsel(INNBOKS) * 2
+
 
         val response = testApi(varslerFromExternalService = varsler) {
-            url("tms-varselbjelle-api/varsel/aktive")
+            url("tms-varselbjelle-api/varsel")
             method = Get
             header("fodselsnummer", "12345678912")
-            header("auth_level", "3")
+            header("auth_level", "4")
         }
 
         runBlocking {
             response.status shouldBe HttpStatusCode.OK
-            val varslerGroupedByType = Json.decodeFromString<VarselbjelleVarslerByType>(response.bodyAsText())
+            val varslerGroupedByType = Json.decodeFromString<VarselbjelleVarsler>(response.bodyAsText())
+            varslerGroupedByType.oppgaver.size shouldBe 2
+            varslerGroupedByType.beskjeder.size shouldBe 5
 
-            val varsel = varslerGroupedByType.beskjeder.first()
-            varsel.isMasked shouldBe true
-            varsel.link shouldBe null
-            varsel.tekst shouldBe null
+            val expected = varsler.first()
+            val varselResponse = varslerGroupedByType.beskjeder.first { it.eventId == expected.eventId }
+            varselResponse.eventId shouldBe expected.eventId
+            varselResponse.isMasked shouldBe false
+            varselResponse.tidspunkt shouldBe expected.forstBehandlet
+            varselResponse.link shouldBe expected.link
+            varselResponse.tekst shouldBe expected.tekst
         }
+    }
+
+    @Test
+    fun `maskerer varselinnhold ved for lavt innlogginsnivå`() {
+        val varsler = listOf(
+            testVarsel(BESKJED, sikkerhetsnivaa = 4),
+        )
+
+        testApi(varslerFromExternalService = varsler) {
+            url("tms-varselbjelle-api/varsel/aktive")
+            method = Get
+            header("fodselsnummer", "12345678912")
+            header("auth_level", "3")
+        }.assert {
+            runBlocking {
+                status shouldBe HttpStatusCode.OK
+                val varslerGroupedByType = Json.decodeFromString<VarselbjelleVarslerByType>(bodyAsText())
+
+                val varsel = varslerGroupedByType.beskjeder.first()
+                varsel.isMasked shouldBe true
+                varsel.link shouldBe null
+                varsel.tekst shouldBe null
+            }
+        }
+
+        testApi(varslerFromExternalService = varsler) {
+            url("tms-varselbjelle-api/varsel")
+            method = Get
+            header("fodselsnummer", "12345678912")
+            header("auth_level", "3")
+        }.assert {
+            runBlocking {
+                status shouldBe HttpStatusCode.OK
+                val varslerGroupedByType = Json.decodeFromString<VarselbjelleVarsler>(bodyAsText())
+
+                val varsel = varslerGroupedByType.beskjeder.first()
+                varsel.isMasked shouldBe true
+                varsel.link shouldBe null
+                varsel.tekst shouldBe null
+            }
+        }
+
+
     }
 
     @Nested
     inner class DoneEndpoint {
 
-        private val defaultBody="""{ "eventId": "doneeventid"}""".trimMargin()
+        private val defaultBody = """{ "eventId": "doneeventid"}""".trimMargin()
+
         @Test
         fun `inaktiverer varsel med eventId`() = testApplication {
             mockDoneApi(HttpStatusCode.OK)
@@ -251,23 +302,6 @@ class VarselApiTest {
         }
         return alleVarslerApiResponse
     }
-
-    private fun testVarsel(
-        varselType: VarselType,
-        eventId: String = "123",
-        forstbehandlet: ZonedDateTime = ZonedDateTime.now(UTC),
-        sikkerhetsnivaa: Int = 4,
-        tekst: String = "teekstæøå",
-        link: String = "liink"
-    ): Varsel =
-        Varsel(
-            eventId = eventId,
-            forstBehandlet = forstbehandlet,
-            type = varselType,
-            sikkerhetsnivaa = sikkerhetsnivaa,
-            tekst = tekst,
-            link = link
-        )
 }
 
 
@@ -276,3 +310,4 @@ private suspend fun ApplicationCall.eventId(): String =
         Json.parseToJsonElement(it).jsonObject["eventId"]?.jsonPrimitive?.content
             ?: throw IllegalArgumentException("eventId finnes ikke i body")
     }
+

@@ -1,4 +1,5 @@
 @file:UseSerializers(ZonedDateTimeSerializer::class)
+
 package no.nav.tms.varselbjelle.api
 
 import kotlinx.serialization.Serializable
@@ -13,12 +14,12 @@ data class VarselbjelleVarslerByType(
     val beskjeder: List<VarselbjelleVarsel>,
     val oppgaver: List<VarselbjelleVarsel>,
     val innbokser: List<VarselbjelleVarsel>
-    ) {
+) {
     companion object {
         fun fromVarsler(varsler: List<Varsel>, authLevel: Int): VarselbjelleVarslerByType {
             val groupedVarsler = varsler.groupBy { it.type }.mapValues { (_, varsler) ->
                 varsler.map { varsel ->
-                    if(varsel.sikkerhetsnivaa > authLevel) {
+                    if (varsel.sikkerhetsnivaa > authLevel) {
                         varsel.toMaskedVarselbjelleVarsel()
                     } else {
                         varsel.toVarselbjelleVarsel()
@@ -47,6 +48,36 @@ data class VarselbjelleVarslerByType(
             isMasked = false,
             tekst = tekst,
             link = link
+        )
+    }
+}
+
+@Serializable
+data class VarselbjelleVarsler(
+    val beskjeder: List<VarselbjelleVarsel>,
+    val oppgaver: List<VarselbjelleVarsel>,
+) {
+    companion object {
+        fun fromVarsler(varsler: List<Varsel>, authLevel: Int): VarselbjelleVarsler {
+            val groupedVarsler = varsler.groupBy { it.type }.mapValues { (_, varsler) ->
+                varsler.map { varsel ->
+                    varsel.toVarselbjelleVarsel(authLevel)
+                }
+            }
+
+            return VarselbjelleVarsler(
+                beskjeder = (groupedVarsler[VarselType.BESKJED] ?: emptyList()) + (groupedVarsler[VarselType.INNBOKS]
+                    ?: emptyList()),
+                oppgaver = groupedVarsler[VarselType.OPPGAVE] ?: emptyList()
+            )
+        }
+
+        private fun Varsel.toVarselbjelleVarsel(authLevel: Int) = VarselbjelleVarsel(
+            eventId = eventId,
+            tidspunkt = forstBehandlet,
+            isMasked = sikkerhetsnivaa > authLevel,
+            tekst = if (sikkerhetsnivaa > authLevel) null else tekst,
+            link = if (sikkerhetsnivaa > authLevel) null else link
         )
     }
 }
