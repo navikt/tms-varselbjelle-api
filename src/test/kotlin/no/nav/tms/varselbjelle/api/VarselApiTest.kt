@@ -138,17 +138,18 @@ class VarselApiTest {
 
         runBlocking {
             response.status shouldBe HttpStatusCode.OK
-            val varslerGroupedByType = Json.decodeFromString<VarselbjelleVarsler>(response.bodyAsText())
-            varslerGroupedByType.oppgaver.size shouldBe 2
-            varslerGroupedByType.beskjeder.size shouldBe 5
+            val varslerGroupedByBeskjedAndOppgaver = Json.decodeFromString<VarselbjelleVarsler>(response.bodyAsText())
+            varslerGroupedByBeskjedAndOppgaver.oppgaver.size shouldBe 2
+            varslerGroupedByBeskjedAndOppgaver.beskjeder.size shouldBe 5
 
             val expected = varsler.first()
-            val varselResponse = varslerGroupedByType.beskjeder.first { it.eventId == expected.eventId }
+            val varselResponse = varslerGroupedByBeskjedAndOppgaver.beskjeder.first { it.eventId == expected.eventId }
             varselResponse.eventId shouldBe expected.eventId
             varselResponse.isMasked shouldBe false
             varselResponse.tidspunkt shouldBe expected.forstBehandlet
             varselResponse.link shouldBe expected.link
             varselResponse.tekst shouldBe expected.tekst
+            varselResponse.type shouldBe expected.type.name
         }
     }
 

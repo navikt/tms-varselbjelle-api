@@ -18,7 +18,14 @@ internal class VarselbjelleVarslerTest {
             beskjeder.size shouldBe 5
             oppgaver.size shouldBe 4
             beskjeder.any { it.isMasked } shouldBe false
+            beskjeder.any { it.type == "INNBOKS" } shouldBe true
+            beskjeder.any { it.type == "BESKJED" } shouldBe true
+            beskjeder.any { it.type == "OPPGAVE" } shouldBe false
+
             oppgaver.any { it.isMasked } shouldBe false
+            oppgaver.any { it.type == "INNBOKS" } shouldBe false
+            oppgaver.any { it.type == "BESKJED" } shouldBe false
+            oppgaver.any { it.type == "OPPGAVE" } shouldBe true
         }
     }
 

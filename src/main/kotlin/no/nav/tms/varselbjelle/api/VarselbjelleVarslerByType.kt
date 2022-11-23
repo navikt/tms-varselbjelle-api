@@ -39,7 +39,8 @@ data class VarselbjelleVarslerByType(
             tidspunkt = forstBehandlet,
             isMasked = true,
             tekst = null,
-            link = null
+            link = null,
+            type = type.name
         )
 
         private fun Varsel.toVarselbjelleVarsel() = VarselbjelleVarsel(
@@ -47,7 +48,8 @@ data class VarselbjelleVarslerByType(
             tidspunkt = forstBehandlet,
             isMasked = false,
             tekst = tekst,
-            link = link
+            link = link,
+            type = type.name
         )
     }
 }
@@ -77,7 +79,8 @@ data class VarselbjelleVarsler(
             tidspunkt = forstBehandlet,
             isMasked = sikkerhetsnivaa > authLevel,
             tekst = if (sikkerhetsnivaa > authLevel) null else tekst,
-            link = if (sikkerhetsnivaa > authLevel) null else link
+            link = if (sikkerhetsnivaa > authLevel) null else link,
+            type = type.name
         )
     }
 }
@@ -89,4 +92,6 @@ data class VarselbjelleVarsel(
     val isMasked: Boolean,
     val tekst: String?,
     val link: String?,
-)
+    val type: String
+) {
+}
