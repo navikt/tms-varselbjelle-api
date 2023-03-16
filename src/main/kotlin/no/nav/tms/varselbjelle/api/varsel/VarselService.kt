@@ -1,20 +1,13 @@
 package no.nav.tms.varselbjelle.api.varsel
 
-import io.ktor.client.HttpClient
-import io.ktor.client.request.header
-import io.ktor.client.request.request
-import io.ktor.client.request.setBody
-import io.ktor.client.request.url
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import io.ktor.server.application.Application
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import no.nav.tms.varselbjelle.api.config.getForIdent
+import mu.KotlinLogging
 import no.nav.tms.varselbjelle.api.azure.AzureTokenFetcher
-import java.lang.Exception
 import java.net.URL
 
 class VarselService(
@@ -23,6 +16,9 @@ class VarselService(
     eventHandlerBaseURL: String,
     eventAggregatorBaseUrl: String
 ) {
+    private val secureLog = KotlinLogging.logger("secureLog")
+
+
     private val varselEndpoint = URL("$eventHandlerBaseURL/fetch/varsel/on-behalf-of/aktive")
     private val doneEndpoint = URL("$eventAggregatorBaseUrl/on-behalf-of/beskjed/done")
 
@@ -49,9 +45,20 @@ class VarselService(
     }
 }
 
+suspend inline fun <reified T> HttpClient.getForIdent(url: URL, fnr: String, accessToken: String): T =
+    withContext(Dispatchers.IO) {
+        request {
+            url(url)
+            method = HttpMethod.Get
+            header("fodselsnummer", fnr)
+            header(HttpHeaders.Authorization, "Bearer $accessToken")
+        }
+    }.body()
+
 class DoneFailedException(val eventId: String, val statusCode: HttpStatusCode) : Exception() {
     fun resolveHttpResponse() = when (statusCode) {
         HttpStatusCode.NotFound -> HttpStatusCode.NotFound
         else -> HttpStatusCode.InternalServerError
     }
 }
+

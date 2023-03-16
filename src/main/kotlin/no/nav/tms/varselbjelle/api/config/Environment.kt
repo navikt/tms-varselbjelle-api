@@ -1,5 +1,11 @@
 package no.nav.tms.varselbjelle.api.config
 
+import io.ktor.client.*
+import io.ktor.client.engine.*
+import io.ktor.client.engine.apache.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
 import no.nav.personbruker.dittnav.common.util.config.StringEnvVar
 import no.nav.personbruker.dittnav.common.util.config.StringEnvVar.getEnvVar
 
@@ -13,3 +19,15 @@ data class Environment(
     val eventaggregatorClientId: String = getEnvVar("EVENTAGGREGATOR_CLIENT_ID"),
     val varselsideUrl: String = getEnvVar("VARSELSIDE_URL")
 )
+
+object HttpClientBuilder {
+
+    fun build(httpClientEngine: HttpClientEngine = Apache.create()): HttpClient {
+        return HttpClient(httpClientEngine) {
+            install(ContentNegotiation) {
+                json(jsonConfig())
+            }
+            install(HttpTimeout)
+        }
+    }
+}

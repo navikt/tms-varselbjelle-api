@@ -20,6 +20,7 @@ fun Route.varsel(varselService: VarselService, varselsideUrl: String) {
 
     val log = KotlinLogging.logger {}
 
+
     get("/varsel") {
         doIfValidRequest { user ->
             val varsler = varselService.getVarsler(user.ident)
