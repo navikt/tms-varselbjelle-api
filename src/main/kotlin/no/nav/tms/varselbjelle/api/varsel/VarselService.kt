@@ -16,7 +16,8 @@ class VarselService(
     eventHandlerBaseURL: String,
     eventAggregatorBaseUrl: String
 ) {
-    private val secureLog = KotlinLogging.logger("secureLog")
+    val secureLog = KotlinLogging.logger("secureLog")
+    val log = KotlinLogging.logger{}
 
 
     private val varselEndpoint = URL("$eventHandlerBaseURL/fetch/varsel/on-behalf-of/aktive")
@@ -39,21 +40,26 @@ class VarselService(
                 setBody("""{"eventId": "$eventId"}""")
             }
         }.apply {
-            if (status != HttpStatusCode.OK)
+            if (!status.isSuccess())
                 throw DoneFailedException(eventId, status)
         }
     }
-}
 
-suspend inline fun <reified T> HttpClient.getForIdent(url: URL, fnr: String, accessToken: String): T =
-    withContext(Dispatchers.IO) {
-        request {
-            url(url)
-            method = HttpMethod.Get
-            header("fodselsnummer", fnr)
-            header(HttpHeaders.Authorization, "Bearer $accessToken")
-        }
-    }.body()
+    suspend inline fun <reified T> HttpClient.getForIdent(url: URL, fnr: String, accessToken: String): T =
+        withContext(Dispatchers.IO) {
+            request {
+                url(url)
+                method = HttpMethod.Get
+                header("fodselsnummer", fnr)
+                header(HttpHeaders.Authorization, "Bearer $accessToken")
+            }
+        }.apply {
+            if(!status.isSuccess()){
+                log.warn { "Request til $url feilet med status $status" }
+                secureLog.warn { "Request til $url feilet med status $status for ident $fnr" }
+            }
+        }.body()
+}
 
 class DoneFailedException(val eventId: String, val statusCode: HttpStatusCode) : Exception() {
     fun resolveHttpResponse() = when (statusCode) {
