@@ -40,7 +40,7 @@ spec:
         - namespace: personbruker
           application: nav-dekoratoren-api
   ingresses:
-    - "https://www.dev.nav.no/tms-varselbjelle-api"
+    - "https://www.intern.dev.nav.no/tms-varselbjelle-api"
   resources:
     limits:
       cpu: "1"
