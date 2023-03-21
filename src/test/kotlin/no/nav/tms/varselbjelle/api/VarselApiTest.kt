@@ -48,25 +48,6 @@ class VarselApiTest {
     private val acceptedFnr = "54235437876"
 
     @Test
-    fun `ende til ende-test av notifikasjon til varselbjelle-varsel`() {
-        val varsler = listOf(testVarsel(BESKJED))
-
-        val response = testApi(varslerFromExternalService = varsler) {
-            url("tms-varselbjelle-api/varsel/sammendrag")
-            method = Get
-            header("fodselsnummer", "12345678912")
-            header("auth_level", "4")
-        }
-        runBlocking {
-            response.status shouldBe HttpStatusCode.OK
-            val sammendragsVarselDto = Json.decodeFromString<VarselbjelleResponse>(response.bodyAsText())
-            sammendragsVarselDto.varsler.totaltAntallUleste shouldBe 1
-            sammendragsVarselDto.varsler.nyesteVarsler shouldHaveSize 1
-            sammendragsVarselDto.varsler.nyesteVarsler.first().varseltekst shouldBe "Du har 1 varsel"
-        }
-    }
-
-    @Test
     fun `Returner varsel med nødvendige felter`() {
         val varsel = testVarsel(
             varselType = BESKJED,

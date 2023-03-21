@@ -24,20 +24,6 @@ fun Route.varsel(varselService: VarselService, varselsideUrl: String) {
         }
     }
 
-    get("/varsel/sammendrag") {
-        doIfValidRequest { user ->
-            try {
-                val notifikasjoner = varselService.getVarsler(user.ident)
-
-                val sammendragsVarsel = SammendragsVarselDto.fromVarsler(notifikasjoner, varselsideUrl)
-                call.respond(HttpStatusCode.OK, VarselbjelleResponse(sammendragsVarsel))
-            } catch (e: Exception) {
-                log.error("Uventet feil ved henting av varsel-sammendrag.", e)
-                call.respond(HttpStatusCode.InternalServerError)
-            }
-        }
-    }
-
     get("/varsel/aktive") {
         doIfValidRequest { user ->
             val varsler = varselService.getVarsler(user.ident)
