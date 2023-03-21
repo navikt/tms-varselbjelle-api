@@ -61,7 +61,8 @@ internal fun testVarsel(
     forstbehandlet: ZonedDateTime = ZonedDateTime.now(ZoneOffset.UTC),
     sikkerhetsnivaa: Int = 4,
     tekst: String = "teekstæøå",
-    link: String = "liink"
+    link: String = "liink",
+    eksternVarslingKanaler: List<String> = emptyList()
 ): Varsel =
     Varsel(
         eventId = eventId,
@@ -69,5 +70,7 @@ internal fun testVarsel(
         type = varselType,
         sikkerhetsnivaa = sikkerhetsnivaa,
         tekst = tekst,
-        link = link
+        link = link,
+        eksternVarslingSendt = eksternVarslingKanaler.isNotEmpty(),
+        eksternVarslingKanaler = eksternVarslingKanaler
     )

@@ -64,13 +64,15 @@ class SammendragsVarselTest {
         varsel.datoOpprettet shouldBe senesteNotifikasjonstidspunkt.toInstant().toEpochMilli().toString()
     }
 
-    private fun testVarsel(forstBehandlet: ZonedDateTime = ZonedDateTime.now(UTC)): Varsel =
+    private fun testVarsel(forstBehandlet: ZonedDateTime = ZonedDateTime.now(UTC), eksternVarslingKanaler: List<String> = emptyList()): Varsel =
         Varsel(
             eventId = "123",
             forstBehandlet = forstBehandlet,
             type = VarselType.BESKJED,
             sikkerhetsnivaa = 4,
             tekst = "",
-            link = ""
+            link = "",
+            eksternVarslingSendt = eksternVarslingKanaler.isNotEmpty(),
+            eksternVarslingKanaler = eksternVarslingKanaler
         )
 }

@@ -15,6 +15,8 @@ data class Varsel(
     val sikkerhetsnivaa: Int,
     val tekst: String,
     val link: String,
+    val eksternVarslingSendt: Boolean,
+    val eksternVarslingKanaler: List<String>
 )
 
 enum class VarselType {
