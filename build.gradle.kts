@@ -31,20 +31,19 @@ dependencies {
     implementation(Ktor2.Server.metricsMicrometer)
     implementation(Ktor2.Server.defaultHeaders)
     implementation(Ktor2.Server.cors)
-    implementation(Ktor2.TmsTokenSupport.azureValidation)
-    implementation(Ktor2.TmsTokenSupport.azureExchange)
+    implementation(TmsKtorTokenSupport.azureExchange)
+    implementation(TmsKtorTokenSupport.azureValidation)
     implementation(KotlinLogging.logging)
     implementation(Logstash.logbackEncoder)
     implementation("io.ktor:ktor-server-call-logging:2.1.1")
-    implementation(Ktor2.kotlinX)
-
+    implementation(Ktor2.Serialization.kotlinX)
     implementation(Micrometer.registryPrometheus)
 
     testImplementation(kotlin("test"))
     testImplementation(Kotest.assertionsCore)
     testImplementation(Kotest.runnerJunit5)
     testImplementation(Ktor2.Test.serverTestHost)
-    testImplementation(Ktor2.TmsTokenSupport.azureValidationMock)
+    testImplementation(TmsKtorTokenSupport.azureValidationMock)
     testImplementation(Mockk.mockk)
 }
 
