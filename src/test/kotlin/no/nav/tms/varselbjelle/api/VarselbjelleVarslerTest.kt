@@ -41,5 +41,18 @@ internal class VarselbjelleVarslerTest {
             }
             oppgaver.filter { it.isMasked }.size shouldBe 4
         }
+        VarselbjelleVarslerByType.fromVarsler(testData,3).assert {
+            beskjeder.size shouldBe 4
+            oppgaver.size shouldBe 4
+            innbokser.size shouldBe 1
+            beskjeder.filter { it.isMasked }.assert {
+                size shouldBe 2
+                first().tekst shouldBe null
+                first().link shouldBe null
+            }
+            innbokser.filter { it.isMasked }.size shouldBe 1
+            oppgaver.filter { it.isMasked }.size shouldBe 4
+        }
+
     }
 }

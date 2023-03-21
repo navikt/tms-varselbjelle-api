@@ -18,15 +18,17 @@ data class Varsel(
     val link: String,
     val eksternVarslingSendt: Boolean,
     val eksternVarslingKanaler: List<String>
-){
+) {
 
     fun toVarselbjelleVarsel(authLevel: Int) = VarselbjelleVarsel(
-    eventId = eventId,
-    tidspunkt = forstBehandlet,
-    isMasked = sikkerhetsnivaa > authLevel,
-    tekst = if (sikkerhetsnivaa > authLevel) null else tekst,
-    link = if (sikkerhetsnivaa > authLevel) null else link,
-    type = type.name
+        eventId = eventId,
+        tidspunkt = forstBehandlet,
+        isMasked = sikkerhetsnivaa > authLevel,
+        tekst = if (sikkerhetsnivaa > authLevel) null else tekst,
+        link = if (sikkerhetsnivaa > authLevel) null else link,
+        type = type.name,
+        eksternVarslingSendt = eksternVarslingSendt,
+        eksternVarslingKanaler = eksternVarslingKanaler
     )
 }
 

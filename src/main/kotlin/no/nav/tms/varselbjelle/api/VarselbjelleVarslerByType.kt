@@ -58,5 +58,7 @@ data class VarselbjelleVarsel(
     val isMasked: Boolean,
     val tekst: String?,
     val link: String?,
-    val type: String
+    val type: String,
+    val eksternVarslingSendt: Boolean,
+    val eksternVarslingKanaler: List<String>
 )
