@@ -17,40 +17,15 @@ data class VarselbjelleVarslerByType(
 ) {
     companion object {
         fun fromVarsler(varsler: List<Varsel>, authLevel: Int): VarselbjelleVarslerByType {
-            val groupedVarsler = varsler.groupBy { it.type }.mapValues { (_, varsler) ->
-                varsler.map { varsel ->
-                    if (varsel.sikkerhetsnivaa > authLevel) {
-                        varsel.toMaskedVarselbjelleVarsel()
-                    } else {
-                        varsel.toVarselbjelleVarsel()
-                    }
-                }
+            val groupedVarsler = varsler.groupBy { it.type }.mapValues { (_, groupedVarsler) ->
+                groupedVarsler.map { it.toVarselbjelleVarsel(authLevel) }
             }
-
             return VarselbjelleVarslerByType(
                 beskjeder = groupedVarsler[VarselType.BESKJED] ?: emptyList(),
                 oppgaver = groupedVarsler[VarselType.OPPGAVE] ?: emptyList(),
                 innbokser = groupedVarsler[VarselType.INNBOKS] ?: emptyList(),
             )
         }
-
-        private fun Varsel.toMaskedVarselbjelleVarsel() = VarselbjelleVarsel(
-            eventId = eventId,
-            tidspunkt = forstBehandlet,
-            isMasked = true,
-            tekst = null,
-            link = null,
-            type = type.name
-        )
-
-        private fun Varsel.toVarselbjelleVarsel() = VarselbjelleVarsel(
-            eventId = eventId,
-            tidspunkt = forstBehandlet,
-            isMasked = false,
-            tekst = tekst,
-            link = link,
-            type = type.name
-        )
     }
 }
 
@@ -73,15 +48,6 @@ data class VarselbjelleVarsler(
                 oppgaver = groupedVarsler[VarselType.OPPGAVE] ?: emptyList()
             )
         }
-
-        private fun Varsel.toVarselbjelleVarsel(authLevel: Int) = VarselbjelleVarsel(
-            eventId = eventId,
-            tidspunkt = forstBehandlet,
-            isMasked = sikkerhetsnivaa > authLevel,
-            tekst = if (sikkerhetsnivaa > authLevel) null else tekst,
-            link = if (sikkerhetsnivaa > authLevel) null else link,
-            type = type.name
-        )
     }
 }
 
@@ -93,5 +59,4 @@ data class VarselbjelleVarsel(
     val tekst: String?,
     val link: String?,
     val type: String
-) {
-}
+)
