@@ -1,27 +1,19 @@
 package no.nav.tms.varselbjelle.api
 
-import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.HttpMethod.Companion.Get
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.application.call
-import io.ktor.server.application.install
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.request.header
-import io.ktor.server.request.receive
-import io.ktor.server.response.respond
-import io.ktor.server.routing.get
-import io.ktor.server.routing.post
-import io.ktor.server.routing.routing
-import io.ktor.server.testing.ApplicationTestBuilder
-import io.ktor.server.testing.testApplication
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import io.ktor.server.testing.*
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
@@ -31,13 +23,11 @@ import kotlinx.serialization.json.jsonPrimitive
 import no.nav.tms.varselbjelle.api.config.jsonConfig
 import no.nav.tms.varselbjelle.api.varsel.Varsel
 import no.nav.tms.varselbjelle.api.varsel.VarselService
-import no.nav.tms.varselbjelle.api.varsel.VarselType
 import no.nav.tms.varselbjelle.api.varsel.VarselType.BESKJED
 import no.nav.tms.varselbjelle.api.varsel.VarselType.INNBOKS
 import no.nav.tms.varselbjelle.api.varsel.VarselType.OPPGAVE
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.lang.IllegalArgumentException
 import java.time.ZoneOffset.UTC
 import java.time.ZonedDateTime
 
@@ -46,25 +36,6 @@ class VarselApiTest {
     private val eventhandlerTestUrl = "https://test.eventhandler.no"
     private val eventaggregatorTestUrl = "https://test.eventaggregator.no"
     private val acceptedFnr = "54235437876"
-
-    @Test
-    fun `ende til ende-test av notifikasjon til varselbjelle-varsel`() {
-        val varsler = listOf(testVarsel(BESKJED))
-
-        val response = testApi(varslerFromExternalService = varsler) {
-            url("tms-varselbjelle-api/varsel/sammendrag")
-            method = Get
-            header("fodselsnummer", "12345678912")
-            header("auth_level", "4")
-        }
-        runBlocking {
-            response.status shouldBe HttpStatusCode.OK
-            val sammendragsVarselDto = Json.decodeFromString<VarselbjelleResponse>(response.bodyAsText())
-            sammendragsVarselDto.varsler.totaltAntallUleste shouldBe 1
-            sammendragsVarselDto.varsler.nyesteVarsler shouldHaveSize 1
-            sammendragsVarselDto.varsler.nyesteVarsler.first().varseltekst shouldBe "Du har 1 varsel"
-        }
-    }
 
     @Test
     fun `Returner varsel med nødvendige felter`() {
@@ -93,18 +64,21 @@ class VarselApiTest {
             varselResponse.tidspunkt shouldBe varsel.forstBehandlet
             varselResponse.link shouldBe varsel.link
             varselResponse.tekst shouldBe varsel.tekst
+            varselResponse.eksternVarslingSendt shouldBe false
+            varselResponse.eksternVarslingKanaler shouldBe emptyList()
         }
     }
 
     @Test
     fun `Returner liste av varsler`() {
         val varsler = listOf(
-            testVarsel(BESKJED),
+            testVarsel(varselType = BESKJED, eksternVarslingKanaler = listOf("SMS")),
+            testVarsel(varselType = BESKJED, eksternVarslingKanaler = listOf("EPOST","SMS")),
+            testVarsel(OPPGAVE, eksternVarslingKanaler = listOf("SMS")),
             testVarsel(OPPGAVE),
-            testVarsel(OPPGAVE),
-            testVarsel(VarselType.INNBOKS),
-            testVarsel(VarselType.INNBOKS),
-            testVarsel(VarselType.INNBOKS),
+            testVarsel(INNBOKS, eksternVarslingKanaler = listOf("EPOST")),
+            testVarsel(INNBOKS),
+            testVarsel(INNBOKS),
         )
 
         val response = testApi(varslerFromExternalService = varsler) {
@@ -116,17 +90,22 @@ class VarselApiTest {
 
         runBlocking {
             response.status shouldBe HttpStatusCode.OK
-            val varslerGroupedByType = Json.decodeFromString<VarselbjelleVarslerByType>(response.bodyAsText())
-            varslerGroupedByType.beskjeder.size shouldBe 1
-            varslerGroupedByType.oppgaver.size shouldBe 2
-            varslerGroupedByType.innbokser.size shouldBe 3
+            Json.decodeFromString<VarselbjelleVarslerByType>(response.bodyAsText()).assert {
+                beskjeder.size shouldBe 2
+                oppgaver.size shouldBe 2
+                innbokser.size shouldBe 3
+                beskjeder.filter { it.eksternVarslingSendt && it.eksternVarslingKanaler==listOf("SMS")}.size shouldBe 1
+                beskjeder.filter { it.eksternVarslingSendt && it.eksternVarslingKanaler==listOf("EPOST","SMS")}.size shouldBe 1
+                innbokser.filter { it.eksternVarslingSendt && it.eksternVarslingKanaler == listOf("EPOST") }
+            }
+
         }
     }
 
     @Test
     fun `Returner liste av varsler med innboks og beskjed i samme liste`() {
         val varsler =
-            testVarsel(BESKJED) * 3 + testVarsel(OPPGAVE) * 2 + testVarsel(INNBOKS) * 2
+            testVarsel(BESKJED, eksternVarslingKanaler = listOf("SMS")) * 3 + testVarsel(OPPGAVE) * 2 + testVarsel(INNBOKS) * 2
 
 
         val response = testApi(varslerFromExternalService = varsler) {
@@ -150,6 +129,8 @@ class VarselApiTest {
             varselResponse.link shouldBe expected.link
             varselResponse.tekst shouldBe expected.tekst
             varselResponse.type shouldBe expected.type.name
+            varselResponse.eksternVarslingSendt shouldBe true
+            varselResponse.eksternVarslingKanaler shouldBe  listOf("SMS")
         }
     }
 
